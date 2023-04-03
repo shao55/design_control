@@ -1,2 +1,9 @@
-# design_control
-Control system of the design process in the project organization
+# Контроль проектирования
+
+1. Автор проекта - Иткаринов Нургиса,
+   Engineering Center ltd., Инженер по планированию.
+
+2. Название проекта - "Контроль проектирования".
+
+3. Описание - Система контроля процесса
+   проектирования в проектной организации Engineering Center ltd.
