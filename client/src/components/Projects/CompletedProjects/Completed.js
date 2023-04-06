@@ -4,8 +4,6 @@ import React from "react";
 function CompletedProjects(props) {
     const { projects } = props;
 
-    console.log(projects);
-
     if (!projects) {
         return <div>Loading...</div>;
     }
@@ -17,8 +15,6 @@ function CompletedProjects(props) {
                     <li key={project.id}>{project.name}</li>
                 ))}
             </ul>
-
-            Привет из завершенных проектов
         </div>
     );
 }
