@@ -1,26 +1,51 @@
 import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Route, Routes } from 'react-router-dom';
+import { useState } from 'react';
+import axios from "axios";
+import Perspective from './typeOfProjects/PerspectiveProjects/Perspective';
+import Current from './typeOfProjects/CurrentProjects/Current';
+import Expertise from './typeOfProjects/ExpertiseProjects/Expertise';
+import Completed from './typeOfProjects/CompletedProjects/Completed';
+
 
 function Projects() {
+
+    const [projects, setProjects] = useState([]);
+    const propsToPass = {
+        projects: projects,
+    };
+
+    const handleCategoryChange = async (category) => {
+        const response = await axios.get(`http://localhost:8000/projects/${category}`);
+        setProjects(response.data);
+    };
+
+    // console.log(projects);
+
     return (
         <div>
             <nav>
                 <ul>
                     <li>
-                        <NavLink to="perspective">Перспективные проекты</NavLink>
+                        <NavLink to="/projects/perspective">Перспективные проекты</NavLink>
                     </li>
                     <li>
-                        <NavLink to="current">Текущие проекты</NavLink>
+                        <NavLink onClick={() => handleCategoryChange("current")} to="/projects/current">Текущие проекты</NavLink>
                     </li>
                     <li>
-                        <NavLink to="expertise">Проекты в экспертизе</NavLink>
+                        <NavLink onClick={() => handleCategoryChange("expertise")} to="/projects/expertise">Проекты в экспертизе</NavLink>
                     </li>
                     <li>
-                        <NavLink to="completed">Завершенные проекты</NavLink>
+                        <NavLink onClick={() => handleCategoryChange("completed")} to="/projects/completed">Завершенные проекты</NavLink>
                     </li>
                 </ul>
             </nav>
-            <Outlet />
+            <Routes>
+                <Route path="/projects/perspective" element={<Perspective />} />
+                <Route path="/projects/current" element={<Current />} />
+                <Route path="/projects/expertise" element={<Expertise />} />
+                <Route path="/projects/completed" element={<Completed />} />
+            </Routes>
         </div>
     );
 }

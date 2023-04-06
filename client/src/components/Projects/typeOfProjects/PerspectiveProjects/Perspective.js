@@ -1,4 +1,4 @@
-import "./PerspectiveProjects.css";
+import "./Perspective.css";
 import React from "react";
 
 function PerspectiveProjects() {

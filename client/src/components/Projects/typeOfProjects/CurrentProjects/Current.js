@@ -1,4 +1,4 @@
-import "./CurrentProjects.css";
+import "./Current.css";
 import React from "react";
 
 function CurrentProjects() {

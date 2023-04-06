@@ -1,4 +1,4 @@
-import "./ExpertiseProjects.css";
+import "./Expertise.css";
 import React from "react";
 
 function ExpertiseProjects() {
