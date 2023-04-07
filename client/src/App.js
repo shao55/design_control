@@ -47,24 +47,76 @@ function App() {
     navigate('/');
   }, []);
 
+  const menuItems = [
+    {
+      title: "Начальная страница",
+      path: "/",
+    },
+    {
+      title: "Проекты",
+      onClick: () => toggleProjectsExpanded(),
+      subMenuItems: [
+        {
+          title: "Перспективные",
+          path: "/projects/perspective",
+          onClick: () => handleCategoryChange("perspective"),
+        },
+        {
+          title: "Текущие",
+          path: "/projects/current",
+          onClick: () => handleCategoryChange("current"),
+        },
+        {
+          title: "В экспертизе",
+          path: "/projects/expertise",
+          onClick: () => handleCategoryChange("expertise"),
+        },
+        {
+          title: "Завершенные",
+          path: "/projects/completed",
+          onClick: () => handleCategoryChange("completed"),
+        },
+      ],
+    },
+    {
+      title: "Контроль проектирования проектов",
+      path: "/design-control",
+    },
+    {
+      title: "Процедура прохождения экспертизы",
+      path: "/expertise",
+    },
+  ];
+
   return (
     <div className='App'>
       <nav id="sidebar">
         <ul>
-          <NavLink to="/">Home</NavLink>
-          <NavLink onClick={() => toggleProjectsExpanded()}>Projects</NavLink>
-          {isProjectsExpanded && (
-            <ul>
-              <NavLink onClick={() => handleCategoryChange("perspective")} to="/projects/perspective">Перспективные</NavLink>
-              <NavLink onClick={() => handleCategoryChange("current")} to="/projects/current">Текущие</NavLink>
-              <NavLink onClick={() => handleCategoryChange("expertise")} to="/projects/expertise">В экспертизе</NavLink>
-              <NavLink onClick={() => handleCategoryChange("completed")} to="/projects/completed">Завершенные</NavLink>
-            </ul>
-          )}
-          <NavLink to="/design-control">Design Control</NavLink>
-          <NavLink to="/expertise">Expertise</NavLink>
+          {menuItems.map((item) => (
+            <li key={item.path}>
+              {item.subMenuItems ? (
+                <>
+                  <NavLink onClick={item.onClick}>{item.title}</NavLink>
+                  {isProjectsExpanded && (
+                    <ul>
+                      {item.subMenuItems.map((subItem) => (
+                        <li key={subItem.path}>
+                          <NavLink onClick={subItem.onClick} to={subItem.path}>
+                            {subItem.title}
+                          </NavLink>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                <NavLink to={item.path}>{item.title}</NavLink>
+              )}
+            </li>
+          ))}
         </ul>
       </nav>
+
       <main>
         <Routes>
           <Route path='/' element={<Home />} />

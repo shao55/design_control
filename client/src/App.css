@@ -12,10 +12,11 @@ main {
   width: 80%;
   margin-left: 20%;
 }
-#sidebar {
-  display: block;
+a {
+  text-decoration: none;
+  list-style-type: none;
 }
 
-#sidebar a.active {
+.active {
   color: red;
 }
