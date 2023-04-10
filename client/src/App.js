@@ -4,8 +4,7 @@ import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import axios from "axios";
 // Стили
 import './App.css';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
+import { ListItemButton, ListItemIcon } from '@mui/material';
 import LayersIcon from '@mui/icons-material/Layers';
 import HomeIcon from '@mui/icons-material/Home';
 import UpdateIcon from '@mui/icons-material/Update';
@@ -14,6 +13,7 @@ import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import DoneIcon from '@mui/icons-material/Done';
 import PercentIcon from '@mui/icons-material/Percent';
 import TableChartIcon from '@mui/icons-material/TableChart';
+
 // Компоненты
 import Home from './components/Home/Home';
 import DesignControl from './components/DesignControl/DesignControl';
@@ -157,7 +157,6 @@ function App() {
           ))}
         </ul>
       </nav>
-
       <main>
         <Routes>
           <Route path='/' element={<Home />} />
