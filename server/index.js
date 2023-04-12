@@ -5,7 +5,7 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: "*" }), express.json());
 
 app.get("/projects/:category", (req, res) => {
     const category = req.params.category;
@@ -28,7 +28,7 @@ app.get("/projects/:category", (req, res) => {
         { id: 16, name: 'Завершенный проект 4', category: 'completed' },
     ];
     const filteredProjects = projects.filter(p => p.category === category);
-    res.json(filteredProjects);
+    res.status(200).send(filteredProjects);
     console.log("Сработал запрос!");
 });
 
