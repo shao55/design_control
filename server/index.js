@@ -1,11 +1,28 @@
 const express = require("express");
-// const router = express.Router();
 const cors = require("cors");
+require("dotenv").config();
+const mongoose = require("mongoose");
+const MenuItem = require("./models/menuItem")
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
 app.use(cors({ origin: "*" }), express.json());
+
+mongoose.connect(
+    process.env.MONGODB_URI,
+    { useNewUrlParser: true, useUnifiedTopology: true },
+    console.log("Connected to MongoDB Atlas")
+);
+
+app.get("/menu-items", async (req, res) => {
+    try {
+        const menuItems = await MenuItem.find();
+        res.status(200).send(menuItems);
+    } catch (error) {
+        res.status(500).send({ message: "Error getting menu items" });
+    }
+});
 
 app.get("/projects/:category", (req, res) => {
     const category = req.params.category;

@@ -13,6 +13,7 @@ import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import DoneIcon from '@mui/icons-material/Done';
 import PercentIcon from '@mui/icons-material/Percent';
 import TableChartIcon from '@mui/icons-material/TableChart';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 
 // Компоненты
 import Home from './components/Home/Home';
@@ -22,6 +23,7 @@ import PerspectiveProjects from './components/Projects/PerspectiveProjects/Persp
 import CurrentProjects from './components/Projects/CurrentProjects/Current';
 import ExpertiseProjects from './components/Projects/ExpertiseProjects/Expertise';
 import CompletedProjects from './components/Projects/CompletedProjects/Completed';
+import AddProject from './components/Projects/addProject/Add';
 
 function App() {
 
@@ -32,7 +34,8 @@ function App() {
     '/projects/expertise': PublishedWithChangesIcon,
     '/projects/completed': DoneIcon,
     '/design-control': PercentIcon,
-    '/expertise': TableChartIcon
+    '/expertise': TableChartIcon,
+    '/addProject': AddBoxIcon,
   };
 
   const navigate = useNavigate();
@@ -40,6 +43,8 @@ function App() {
   const [isProjectsExpanded, setProjectsExpanded] = useState(false);
   // Хук для хранения списока проектов по разделам
   const [projects, setProjects] = useState([]);
+
+  const [menuItems, setMenuItems] = useState([]);
 
   // Запрашиваю данные с сервера и сохраняю в хук
   const handleCategoryChange = async (category) => {
@@ -64,58 +69,15 @@ function App() {
   };
   // При первом рендере загружаю состояние списка и перехожу на главную страницу
   useEffect(() => {
+    const fetchMenuItems = async () => {
+      const response = await axios.get("http://localhost:8000/menu-items");
+      setMenuItems(response.data);
+    };
+
+    fetchMenuItems();
     loadStateToSessionStorage();
     navigate('/');
   }, []);
-
-  const menuItems = [
-    {
-      id: 1,
-      title: "Начальная страница",
-      path: "/",
-    },
-    {
-      id: 2,
-      title: "Проекты",
-      onClick: () => toggleProjectsExpanded(),
-      subMenuItems: [
-        {
-          id: 2.1,
-          title: "Перспективные",
-          path: "/projects/perspective",
-          onClick: () => handleCategoryChange("perspective"),
-        },
-        {
-          id: 2.2,
-          title: "Текущие",
-          path: "/projects/current",
-          onClick: () => handleCategoryChange("current"),
-        },
-        {
-          id: 2.3,
-          title: "В экспертизе",
-          path: "/projects/expertise",
-          onClick: () => handleCategoryChange("expertise"),
-        },
-        {
-          id: 2.4,
-          title: "Завершенные",
-          path: "/projects/completed",
-          onClick: () => handleCategoryChange("completed"),
-        },
-      ],
-    },
-    {
-      id: 3,
-      title: "Контроль проектирования проектов",
-      path: "/design-control",
-    },
-    {
-      id: 4,
-      title: "Процедура прохождения экспертизы",
-      path: "/expertise",
-    },
-  ];
 
   return (
     <div className='App'>
@@ -160,12 +122,13 @@ function App() {
       <main>
         <Routes>
           <Route path='/' element={<Home />} />
-          <Route path='/projects/perspective' element={<PerspectiveProjects projects={projects} />} />
-          <Route path='/projects/current' element={<CurrentProjects projects={projects} />} />
-          <Route path='/projects/expertise' element={<ExpertiseProjects projects={projects} />} />
-          <Route path='/projects/completed' element={<CompletedProjects projects={projects} />} />
+          <Route path='/projects/perspective' element={<PerspectiveProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
+          <Route path='/projects/current' element={<CurrentProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
+          <Route path='/projects/expertise' element={<ExpertiseProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
+          <Route path='/projects/completed' element={<CompletedProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
           <Route path='/design-control' element={<DesignControl />} />
           <Route path='/expertise' element={<Expertise />} />
+          <Route path='/addProject' element={<AddProject />} />
         </Routes>
       </main>
     </div>
