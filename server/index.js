@@ -7,7 +7,7 @@ const MenuItem = require("./models/menuItem")
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-app.use(cors({ origin: "*" }), express.json());
+app.use(cors({ origin: "*" }));
 
 mongoose.connect(
     process.env.MONGODB_URI,
@@ -45,7 +45,7 @@ app.get("/projects/:category", (req, res) => {
         { id: 16, name: 'Завершенный проект 4', category: 'completed' },
     ];
     const filteredProjects = projects.filter(p => p.category === category);
-    res.status(200).send(filteredProjects);
+    res.json(filteredProjects);
     console.log("Сработал запрос!");
 });
 
