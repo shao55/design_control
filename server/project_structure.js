@@ -13,10 +13,14 @@ const projectJSON = {
             "sheets": [
                 {
                     "name": "Лист 1",
-                    "readiness": 50,
                     "specificWeight": 0.1,
                     "comment": "Комментарий о листе",
-                    "fixationDate": "12-04-2023"
+                    "changes": [
+                        {
+                            "readiness": 50,
+                            "fixationDate": "12-04-2023"
+                        }
+                    ]
                 }
             ]
         }

@@ -8,10 +8,6 @@ function PerspectiveProjects(props) {
         return <div>Loading...</div>;
     }
 
-    useEffect(() => {
-        handleCategoryChange('perspective');
-    }, [handleCategoryChange]);
-
     return (
         <div>
             <ul>

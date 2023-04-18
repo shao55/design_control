@@ -1,8 +1,7 @@
-// Компоненты
 import React, { useEffect, useState } from 'react';
 import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import axios from "axios";
-// Стили
+
 import './App.css';
 import { ListItemButton, ListItemIcon } from '@mui/material';
 import LayersIcon from '@mui/icons-material/Layers';
@@ -15,7 +14,6 @@ import PercentIcon from '@mui/icons-material/Percent';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 
-// Компоненты
 import Home from './components/Home/Home';
 import DesignControl from './components/DesignControl/DesignControl';
 import Expertise from './components/Expertise/Expertise';
@@ -39,35 +37,27 @@ function App() {
   };
 
   const navigate = useNavigate();
-  // Хук для выпадающего списка раздела "Проекты"
   const [isProjectsExpanded, setProjectsExpanded] = useState(false);
-  // Хук для хранения списока проектов по разделам
   const [projects, setProjects] = useState([]);
-
   const [menuItems, setMenuItems] = useState([]);
 
-  // Запрашиваю данные с сервера и сохраняю в хук
   const handleCategoryChange = async (category) => {
     const response = await axios.get(`http://localhost:8000/projects/${category}`);
     setProjects(response.data);
   };
-  // Сохраняю в Session Storage значение из хука isProjectsExpanded
   const saveStateToSessionStorage = (params) => {
     sessionStorage.setItem("isProjectsListExpanded", JSON.stringify(params));
   }
-  // Загружаю из Session Storage состояние открытого списка
   const loadStateToSessionStorage = () => {
     const isExpanded = JSON.parse(sessionStorage.getItem("isProjectsListExpanded"));
     if (isExpanded) {
       setProjectsExpanded(isExpanded);
     }
   }
-  // Функция для вызова 
   const toggleProjectsExpanded = () => {
     setProjectsExpanded(!isProjectsExpanded);
     saveStateToSessionStorage(!isProjectsExpanded);
   };
-  // При первом рендере загружаю состояние списка и перехожу на главную страницу
   useEffect(() => {
     const fetchMenuItems = async () => {
       const response = await axios.get("http://localhost:8000/menu-items");
@@ -81,18 +71,17 @@ function App() {
 
   return (
     <div className='App'>
-
       <nav id="sidebar">
         <ul className='mainListItem'>
           {menuItems.map((item) => (
             <li key={item.id}>
               {item.subMenuItems ? (
-                <>
+                <div>
                   <ListItemButton>
                     <ListItemIcon>
                       <LayersIcon />
                     </ListItemIcon>
-                    <NavLink onClick={item.onClick}>{item.title}</NavLink>
+                    <NavLink onClick={() => toggleProjectsExpanded()}>{item.title}</NavLink>
                   </ListItemButton>
                   {isProjectsExpanded && (
                     <ul className='subListItem'>
@@ -101,12 +90,17 @@ function App() {
                           <ListItemIcon>
                             {React.createElement(iconMap[subItem.path])}
                           </ListItemIcon>
-                          <NavLink onClick={subItem.onClick} to={subItem.path}>{subItem.title}</NavLink>
+                          <NavLink
+                            onClick={() => handleCategoryChange(subItem.path.split("/").pop())}
+                            to={subItem.path}
+                          >
+                            {subItem.title}
+                          </NavLink>
                         </ListItemButton>
                       ))}
                     </ul>
                   )}
-                </>
+                </div>
               ) : (
                 <ListItemButton>
                   <ListItemIcon>
