@@ -80,6 +80,7 @@ function AddProject() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        console.log(project);
         try {
             const response = await fetch('Добавить адрес ПОСТ запроса', {
                 method: 'POST',
@@ -102,7 +103,7 @@ function AddProject() {
 
     return (
         <Container>
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h4" align="center" gutterBottom m={2} >
                 Добавить проект
             </Typography>
             <form onSubmit={handleSubmit}>
@@ -195,9 +196,8 @@ function AddProject() {
                                             label="Удельный вес"
                                             name="specificWeight"
                                             size="small"
-                                            value={constructive.specificWeight != null ? constructive.specificWeight * 100 : ''} // Умножаем на 100 для отображения в виде процента, если значение установлено
+                                            value={constructive.specificWeight != null ? constructive.specificWeight * 100 : ''}
                                             onChange={(event) => {
-                                                // Конвертируем введенное значение в процент и вызываем handleConstructiveChange
                                                 const valueAsPercent = parseFloat(event.target.value) / 100;
                                                 handleConstructiveChange(cIndex, { target: { name: event.target.name, value: valueAsPercent } });
                                             }}
@@ -206,7 +206,6 @@ function AddProject() {
                                             }}
                                         />
                                     </Grid>
-
                                     <Grid item xs={12} sm={4}>
                                         <TextField
                                             fullWidth
@@ -224,7 +223,6 @@ function AddProject() {
                                     </Grid>
                                 </Grid>
                             </Grid>
-
 
                             {constructive.sheets.map((sheet, sIndex) => (
                                 <Box key={sIndex} m={2} ml={4}>
@@ -250,10 +248,17 @@ function AddProject() {
                                                         label="Удельный вес"
                                                         name="specificWeight"
                                                         size="small"
-                                                        value={sheet.specificWeight}
-                                                        onChange={(event) => handleSheetChange(cIndex, sIndex, event)}
+                                                        value={sheet.specificWeight != null ? sheet.specificWeight * 100 : ''}
+                                                        onChange={(event) => {
+                                                            const valueAsPercent = parseFloat(event.target.value) / 100;
+                                                            handleSheetChange(cIndex, sIndex, { target: { name: event.target.name, value: valueAsPercent } });
+                                                        }}
+                                                        InputProps={{
+                                                            startAdornment: <InputAdornment position="start">%</InputAdornment>,
+                                                        }}
                                                     />
                                                 </Grid>
+
                                                 <Grid item xs={12} sm={4}>
                                                     <TextField
                                                         fullWidth
