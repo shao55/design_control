@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
+import { NavLink, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import axios from "axios";
 
 import './App.css';
-import { ListItemButton, ListItemIcon } from '@mui/material';
+import { ListItemButton, ListItemIcon, Backdrop, CircularProgress } from '@mui/material';
 import LayersIcon from '@mui/icons-material/Layers';
 import HomeIcon from '@mui/icons-material/Home';
 import UpdateIcon from '@mui/icons-material/Update';
@@ -37,9 +37,11 @@ function App() {
   };
 
   const navigate = useNavigate();
+  const location = useLocation();
   const [isProjectsExpanded, setProjectsExpanded] = useState(false);
   const [projects, setProjects] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleCategoryChange = async (category) => {
     const response = await axios.get(`http://localhost:8000/projects/${category}`);
@@ -58,16 +60,40 @@ function App() {
     setProjectsExpanded(!isProjectsExpanded);
     saveStateToSessionStorage(!isProjectsExpanded);
   };
+  const updateLastVisitedRoute = (route) => {
+    sessionStorage.setItem("lastVisitedRoute", route)
+  };
   useEffect(() => {
+    const lastVisitedRoute = sessionStorage.getItem("lastVisitedRoute");
+    if (lastVisitedRoute) {
+      navigate(lastVisitedRoute, { replace: true })
+      if (lastVisitedRoute.includes("/projects/")) {
+        const category = lastVisitedRoute.split("/").pop();
+        handleCategoryChange(category);
+      }
+    } else {
+      navigate('/', { replace: true })
+    }
     const fetchMenuItems = async () => {
-      const response = await axios.get("http://localhost:8000/menu-items");
-      setMenuItems(response.data);
+      try {
+        const response = await axios.get("http://localhost:8000/menu-items");
+        setMenuItems(response.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
     };
-
     fetchMenuItems();
-    loadStateToSessionStorage();
-    navigate('/');
   }, []);
+
+  useEffect(() => {
+    loadStateToSessionStorage();
+  }, [menuItems]);
+
+  useEffect(() => {
+    updateLastVisitedRoute(location.pathname)
+  }, [location.pathname])
 
   return (
     <div className='App'>
@@ -125,6 +151,9 @@ function App() {
           <Route path='/addProject' element={<AddProject />} />
         </Routes>
       </main>
+      <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </div>
   );
 }

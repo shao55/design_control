@@ -10,41 +10,67 @@ import {
     Paper,
     IconButton,
     Box,
-    InputAdornment
+    InputAdornment,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 
 function AddProject() {
-    const [project, setProject] = useState({
+    const initialProjectState = {
         name: '',
         customer: '',
         management: '',
         designOrganization: '',
         curator: '',
-        projectStatus: '',
+        category: '',
         constructiveGroups: [],
-    });
+    }
+    const [project, setProject] = useState(initialProjectState);
+    const [totalConstructiveWeight, setTotalConstructiveWeight] = useState(0);
+    const [totalSheetWeight, setTotalSheetWeight] = useState([]);
+
+    const calculateWeights = () => {
+        const newTotalConstructiveWeight = project.constructiveGroups.reduce(
+            (acc, group) => acc + parseFloat(group.specificWeight || 0),
+            0
+        );
+        setTotalConstructiveWeight(newTotalConstructiveWeight);
+
+        const newTotalSheetWeight = project.constructiveGroups.map((group) => {
+            if (group.sheets && group.sheets.length > 0) {
+                return group.sheets.reduce((acc, sheet) => {
+                    const specificWeight = sheet.specificWeight === '' ? 0 : parseFloat(sheet.specificWeight);
+                    return acc + specificWeight;
+                }, 0);
+            }
+            return 0;
+        });
+        setTotalSheetWeight(newTotalSheetWeight);
+    };
+
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setProject({ ...project, [name]: value });
     };
-
     const handleConstructiveChange = (index, event) => {
         const { name, value } = event.target;
         const newConstructiveGroups = [...project.constructiveGroups];
         newConstructiveGroups[index][name] = value;
         setProject({ ...project, constructiveGroups: newConstructiveGroups });
+        calculateWeights();
     };
-
     const handleSheetChange = (cIndex, sIndex, event) => {
         const { name, value } = event.target;
         const newConstructiveGroups = [...project.constructiveGroups];
         newConstructiveGroups[cIndex].sheets[sIndex][name] = value;
         setProject({ ...project, constructiveGroups: newConstructiveGroups });
+        calculateWeights();
     };
-
     const addConstructive = () => {
         setProject({
             ...project,
@@ -54,35 +80,31 @@ function AddProject() {
             ],
         });
     };
-
     const addSheet = (index) => {
         const newConstructiveGroups = [...project.constructiveGroups];
         newConstructiveGroups[index].sheets.push({
             name: '',
-            specificWeight: '',
+            specificWeight: 0,
             comment: '',
             changes: [],
         });
         setProject({ ...project, constructiveGroups: newConstructiveGroups });
     };
-
     const removeConstructive = (index) => {
         const newConstructiveGroups = [...project.constructiveGroups];
         newConstructiveGroups.splice(index, 1);
         setProject({ ...project, constructiveGroups: newConstructiveGroups });
     };
-
     const removeSheet = (cIndex, sIndex) => {
         const newConstructiveGroups = [...project.constructiveGroups];
         newConstructiveGroups[cIndex].sheets.splice(sIndex, 1);
         setProject({ ...project, constructiveGroups: newConstructiveGroups });
     };
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         console.log(project);
         try {
-            const response = await fetch('Добавить адрес ПОСТ запроса', {
+            const response = await fetch('http://localhost:8000/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,6 +114,7 @@ function AddProject() {
 
             if (response.ok) {
                 const data = await response.json();
+                setProject(initialProjectState);
                 console.log('Проект успешно добавлен:', data);
             } else {
                 console.error('Ошибка при добавлении проекта:', response.statusText);
@@ -107,7 +130,6 @@ function AddProject() {
                 Добавить проект
             </Typography>
             <form onSubmit={handleSubmit}>
-                {/* Основные свойства проекта */}
                 <Grid container spacing={3}>
                     <Grid item xs={12} sm={6}>
                         <TextField
@@ -160,23 +182,31 @@ function AddProject() {
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <TextField
-                            fullWidth
-                            required
-                            label="Статус проекта"
-                            name="projectStatus"
-                            value={project.projectStatus}
-                            onChange={handleInputChange}
-                        />
+                        <FormControl fullWidth required>
+                            <InputLabel id="project-status-label">Статус проекта</InputLabel>
+                            <Select
+                                labelId="project-status-label"
+                                name="category"
+                                value={project.category}
+                                onChange={handleInputChange}
+                            >
+                                <MenuItem value="completed">Завершенный</MenuItem>
+                                <MenuItem value="expertise">Проект в экспертизе</MenuItem>
+                                <MenuItem value="current">Текущий</MenuItem>
+                                <MenuItem value="perspective">Перспективный</MenuItem>
+                            </Select>
+                        </FormControl>
                     </Grid>
                 </Grid>
-
-                {/* Конструктивы и листы */}
+                {project.constructiveGroups.length > 0 && (
+                    <Typography variant="h6" gutterBottom mt={4}>
+                        Сумма удельного веса всех конструктивов: {`${Math.round(totalConstructiveWeight * 100)}%`}
+                    </Typography>
+                )}
                 {project.constructiveGroups.map((constructive, cIndex) => (
                     <Box key={cIndex} mt={6} mb={6}>
                         <Paper elevation={12}>
                             <Grid container spacing={2}>
-                                {/* Свойства конструктива */}
                                 <Grid container spacing={2} m={2} alignItems={"center"}>
                                     <Grid item xs={12} sm={4}>
                                         <TextField
@@ -196,9 +226,9 @@ function AddProject() {
                                             label="Удельный вес"
                                             name="specificWeight"
                                             size="small"
-                                            value={constructive.specificWeight != null ? constructive.specificWeight * 100 : ''}
+                                            value={constructive.specificWeight != null ? Math.round(constructive.specificWeight * 100) : ''}
                                             onChange={(event) => {
-                                                const valueAsPercent = parseFloat(event.target.value) / 100;
+                                                const valueAsPercent = event.target.value === '' ? '' : parseFloat(event.target.value) / 100;
                                                 handleConstructiveChange(cIndex, { target: { name: event.target.name, value: valueAsPercent } });
                                             }}
                                             InputProps={{
@@ -223,12 +253,10 @@ function AddProject() {
                                     </Grid>
                                 </Grid>
                             </Grid>
-
                             {constructive.sheets.map((sheet, sIndex) => (
                                 <Box key={sIndex} m={2} ml={4}>
                                     <Paper elevation={8}>
                                         <Grid container spacing={1} m={2}>
-                                            {/* Свойства листа */}
                                             <Grid container spacing={1} pt={2} pb={2} alignItems={"center"}>
                                                 <Grid item xs={12} sm={4}>
                                                     <TextField
@@ -248,9 +276,9 @@ function AddProject() {
                                                         label="Удельный вес"
                                                         name="specificWeight"
                                                         size="small"
-                                                        value={sheet.specificWeight != null ? sheet.specificWeight * 100 : ''}
+                                                        value={sheet.specificWeight != null ? Math.round(sheet.specificWeight * 100) : ''}
                                                         onChange={(event) => {
-                                                            const valueAsPercent = parseFloat(event.target.value) / 100;
+                                                            const valueAsPercent = event.target.value === '' ? '' : parseFloat(event.target.value) / 100;
                                                             handleSheetChange(cIndex, sIndex, { target: { name: event.target.name, value: valueAsPercent } });
                                                         }}
                                                         InputProps={{
@@ -280,9 +308,13 @@ function AddProject() {
 
                                 </Box>
                             ))}
-
                             <Grid container justifyContent="flex-start" spacing={2} p={2}>
                                 <Grid item>
+                                    {totalSheetWeight[cIndex] != null && (
+                                        <Typography variant="h6" gutterBottom>
+                                            Сумма удельного веса всех листов в конструктиве: {`${Math.round(totalSheetWeight[cIndex] * 100)}%`}
+                                        </Typography>
+                                    )}
                                     <Button
                                         onClick={() => addSheet(cIndex)}
                                         variant="contained"

@@ -1,10 +1,12 @@
 const express = require("express");
 const cors = require("cors");
+const bodyParser = require("body-parser")
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
 app.use(cors({ origin: "*" }));
+app.use(bodyParser.json());
 
 const menuItems = [
     {
@@ -71,18 +73,6 @@ const projects = [
     { id: 2, name: 'Текущий проект 2', category: 'current' },
     { id: 3, name: 'Проект в экспертизе 3', category: 'expertise' },
     { id: 4, name: 'Завершенный проект 4', category: 'completed' },
-    { id: 5, name: 'Перспективный проект 1', category: 'perspective' },
-    { id: 6, name: 'Текущий проект 2', category: 'current' },
-    { id: 7, name: 'Проект в экспертизе 3', category: 'expertise' },
-    { id: 8, name: 'Завершенный проект 4', category: 'completed' },
-    { id: 9, name: 'Перспективный проект 1', category: 'perspective' },
-    { id: 10, name: 'Текущий проект 2', category: 'current' },
-    { id: 11, name: 'Проект в экспертизе 3', category: 'expertise' },
-    { id: 12, name: 'Завершенный проект 4', category: 'completed' },
-    { id: 13, name: 'Перспективный проект 1', category: 'perspective' },
-    { id: 14, name: 'Текущий проект 2', category: 'current' },
-    { id: 15, name: 'Проект в экспертизе 3', category: 'expertise' },
-    { id: 16, name: 'Завершенный проект 4', category: 'completed' },
 ];
 
 app.get("/menu-items", async (req, res) => {
@@ -98,6 +88,20 @@ app.get("/projects/:category", (req, res) => {
     const filteredProjects = projects.filter(p => p.category === category);
     res.json(filteredProjects);
     console.log("Сработал запрос!");
+});
+
+app.post("/create", (req, res) => {
+    const newProject = req.body;
+
+    if (newProject && newProject.name) {
+        const maxId = projects.reduce((max, project) => Math.max(max, project.id), 0);
+        newProject.id = maxId + 1;
+        projects.push(newProject);
+        res.status(201).send(newProject);
+        console.log(projects)
+    } else {
+        res.status(400).send({ message: "Invalid project data" });
+    }
 });
 
 app.listen(PORT, () => {
