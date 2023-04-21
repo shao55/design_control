@@ -1,12 +1,15 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser")
+const bodyParser = require("body-parser");
+const { addDays, isWeekend, parseISO, isSameDay, format, startOfDay } = require("date-fns");
+const { zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
 app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
+app.use(express.json());
 
 const menuItems = [
     {
@@ -75,6 +78,43 @@ const projects = [
     { id: 4, name: 'Завершенный проект 4', category: 'completed' },
 ];
 
+const holidays = [
+    "2023-01-02",
+    "2023-01-03",
+    "2023-03-08",
+    "2023-03-21",
+    "2023-03-22",
+    "2023-03-23",
+    "2023-05-01",
+    "2023-05-08",
+    "2023-05-09",
+    "2023-06-28",
+    "2023-07-06",
+    "2023-07-07",
+    "2023-08-30",
+    "2023-10-25",
+    "2023-12-18",
+    // Формат: "YYYY-MM-DD"
+];
+
+function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/Almaty") {
+    const holidayDates = holidays.map((holiday) => parseISO(holiday));
+    let currentDate = startDate;
+    let daysAdded = 0;
+
+    while (daysAdded < daysToAdd) {
+        currentDate = addDays(currentDate, 1);
+
+        if (isWeekend(currentDate) || holidayDates.some((holiday) => isSameDay(holiday, currentDate))) {
+            continue;
+        }
+
+        daysAdded++;
+    }
+
+    return currentDate;
+}
+
 app.get("/menu-items", async (req, res) => {
     try {
         res.status(200).send(menuItems);
@@ -103,6 +143,29 @@ app.post("/create", (req, res) => {
         res.status(400).send({ message: "Invalid project data" });
     }
 });
+
+app.post("/calculate-date", (req, res) => {
+    const { startDate, daysToAdd, timeZone, useCalendarDays } = req.body;
+
+    if (!startDate || typeof daysToAdd !== "number" || !timeZone) {
+        return res.status(400).send({ message: "Invalid input" });
+    }
+
+    const parsedStartDate = utcToZonedTime(startOfDay(parseISO(startDate)), timeZone);
+
+    let newDate;
+    if (useCalendarDays) {
+        newDate = addDays(parsedStartDate, daysToAdd);
+    } else {
+        newDate = addBusinessDays(parsedStartDate, daysToAdd, holidays);
+    }
+
+    const utcNewDate = zonedTimeToUtc(newDate, timeZone);
+    const formattedNewDate = format(utcNewDate, "yyyy-MM-dd");
+
+    res.status(200).send({ newDate: formattedNewDate });
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);

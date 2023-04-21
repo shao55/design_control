@@ -17,11 +17,11 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import Home from './components/Home/Home';
 import DesignControl from './components/DesignControl/DesignControl';
 import Expertise from './components/Expertise/Expertise';
-import PerspectiveProjects from './components/Projects/PerspectiveProjects/Perspective';
-import CurrentProjects from './components/Projects/CurrentProjects/Current';
-import ExpertiseProjects from './components/Projects/ExpertiseProjects/Expertise';
-import CompletedProjects from './components/Projects/CompletedProjects/Completed';
-import AddProject from './components/Projects/addProject/Add';
+import PerspectiveProjects from './components/Projects/Perspective/Perspective';
+import CurrentProjects from './components/Projects/Current/Current';
+import ExpertiseProjects from './components/Projects/Expertise/Expertise';
+import CompletedProjects from './components/Projects/Completed/Completed';
+import AddProject from './components/Projects/Add/Add';
 
 function App() {
 
