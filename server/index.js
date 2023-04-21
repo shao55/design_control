@@ -72,10 +72,128 @@ const menuItems = [
 ];
 
 const projects = [
-    { id: 1, name: 'Перспективный проект 1', category: 'perspective' },
-    { id: 2, name: 'Текущий проект 2', category: 'current' },
-    { id: 3, name: 'Проект в экспертизе 3', category: 'expertise' },
-    { id: 4, name: 'Завершенный проект 4', category: 'completed' },
+    {
+        id: 1,
+        name: 'Обновленный перспективный проект 1 с новой структурой',
+        customer: '',
+        management: '',
+        designOrganization: '',
+        curator: '',
+        category: 'perspective',
+        expertiseDates: [],
+        constructiveGroups: [
+            {
+                name: 'Конструктив 1',
+                specificWeight: 0.25,
+                comment: "Комментарий о конструктиве",
+                sheets: [
+                    {
+                        name: "Лист 1",
+                        specificWeight: 0.1,
+                        comment: "Комментарий о листе",
+                        changes: [
+                            {
+                                readiness: 50,
+                                fixationDate: "12-04-2023"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 2,
+        name: 'Обновленный текущий проект 2 с новой структурой',
+        customer: '',
+        management: '',
+        designOrganization: '',
+        curator: '',
+        category: 'current',
+        expertiseDates: [],
+        constructiveGroups: [
+            {
+                name: 'Конструктив 1',
+                specificWeight: 0.25,
+                comment: "Комментарий о конструктиве",
+                sheets: [
+                    {
+                        name: "Лист 1",
+                        specificWeight: 0.1,
+                        comment: "Комментарий о листе",
+                        changes: [
+                            {
+                                readiness: 50,
+                                fixationDate: "12-04-2023"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 3,
+        name: 'Обновленный проект в экспертизе 3 с новой структурой',
+        customer: '',
+        management: '',
+        management: '',
+        designOrganization: '',
+        curator: '',
+        category: 'expertise',
+        expertiseDates: [],
+        constructiveGroups: [
+            {
+                name: 'Конструктив 1',
+                specificWeight: 0.25,
+                comment: "Комментарий о конструктиве",
+                sheets: [
+                    {
+                        name: "Лист 1",
+                        specificWeight: 0.1,
+                        comment: "Комментарий о листе",
+                        changes: [
+                            {
+                                readiness: 50,
+                                fixationDate: "12-04-2023"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 4,
+        name: 'Обновленный завершенный проект 4 с новой структурой',
+        customer: '',
+        management: '',
+        management: '',
+        designOrganization: '',
+        curator: '',
+        category: 'completed',
+        expertiseDates: [],
+        constructiveGroups: [
+            {
+                name: 'Конструктив 1',
+                specificWeight: 0.25,
+                comment: "Комментарий о конструктиве",
+                sheets: [
+                    {
+                        name: "Лист 1",
+                        specificWeight: 0.1,
+                        comment: "Комментарий о листе",
+                        changes: [
+                            {
+                                readiness: 50,
+                                fixationDate: "12-04-2023"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
 ];
 
 const holidays = [
@@ -166,7 +284,29 @@ app.post("/calculate-date", (req, res) => {
     res.status(200).send({ newDate: formattedNewDate });
 });
 
+app.get("/allProjects", (req, res) => {
+    res.json(projects);
+    console.log("Запрос списка всех проектов");
+});
+
+app.post("/update-project-dates", (req, res) => {
+    const { projectId, expertiseDates } = req.body;
+
+    if (!projectId || !expertiseDates) {
+        return res.status(400).send({ message: "Invalid input" });
+    }
+
+    const projectIndex = projects.findIndex((project) => project.id === projectId);
+
+    if (projectIndex !== -1) {
+        projects[projectIndex].expertiseDates = expertiseDates;
+        res.status(200).send({ message: "Project dates updated successfully" });
+        console.log(projects)
+    } else {
+        res.status(404).send({ message: "Project not found" });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
-})
+});

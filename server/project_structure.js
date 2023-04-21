@@ -1,13 +1,14 @@
 const projectJSON = {
-    "name": "Здание 1",
-    "customer": "Заказчик 1",
-    "management": "Управление 1",
-    "designOrganization": "Проектная организация 1",
-    "curator": "Куратор 1",
-    "projectStatus": "Статус проекта 1",
-    "constructiveGroups": [
+    'name': '',
+    'customer': '',
+    'management': '',
+    'designOrganization': '',
+    'curator': '',
+    'category': '',
+    'expertiseDates': [], // Даты экспертизы
+    'constructiveGroups': [
         {
-            "name": "Конструктив 1",
+            "name": 'Конструктив 1',
             "specificWeight": 0.25,
             "comment": "Комментарий о конструктиве",
             "sheets": [
@@ -25,4 +26,4 @@ const projectJSON = {
             ]
         }
     ]
-}
+};

@@ -1,0 +1,5 @@
+.chart-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}

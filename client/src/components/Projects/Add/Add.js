@@ -27,6 +27,7 @@ function AddProject() {
         designOrganization: '',
         curator: '',
         category: '',
+        expertiseDates: [],
         constructiveGroups: [],
     }
     const [project, setProject] = useState(initialProjectState);
@@ -187,6 +188,7 @@ function AddProject() {
                             <Select
                                 labelId="project-status-label"
                                 name="category"
+                                label="Статус проекта"
                                 value={project.category}
                                 onChange={handleInputChange}
                             >
