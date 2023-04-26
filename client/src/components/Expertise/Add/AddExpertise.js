@@ -15,9 +15,9 @@ import {
     Button
 } from '@mui/material';
 import * as d3 from 'd3';
-import "./Expertise.css"
+import "./AddExpertise.css"
 
-const Expertise = () => {
+const AddExpertise = () => {
     const [startDate, setStartDate] = useState('');
     const [newDates, setNewDates] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -377,4 +377,4 @@ const Expertise = () => {
     );
 };
 
-export default Expertise;
+export default AddExpertise;

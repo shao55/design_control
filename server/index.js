@@ -22,7 +22,7 @@ const menuItems = [
         id: 2,
         title: "Проекты",
         icon: "LayersIcon",
-        onClick: "() => toggleProjectsExpanded()",
+        onClick: "toggleProjectsExpanded",
         subMenuItems: [
             {
                 id: 2.1,
@@ -64,9 +64,23 @@ const menuItems = [
     },
     {
         id: 4,
-        path: "/expertise",
         title: "Прохождение экспертизы",
-        icon: "TableChartIcon",
+        icon: "LayersIcon",
+        onClick: "toggleExpertiseExpanded",
+        subMenuItems: [
+            {
+                id: 4.1,
+                path: "/expertise/add-expertise",
+                title: "Добавить сроки экспертизы",
+                icon: "MoreTimeIcon",
+            },
+            {
+                id: 4.2,
+                path: "/expertise/all-expertise",
+                title: "Свод сроков экспертизы",
+                icon: "ViewTimelineIcon",
+            },
+        ],
     },
 
 ];
