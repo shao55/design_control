@@ -27,6 +27,13 @@ import AddExpertise from './components/Expertise/Add/AddExpertise';
 import AllExpertise from './components/Expertise/All/AllExpertise';
 
 function App() {
+  const [isProjectsExpanded, setProjectsExpanded] = useState(false);
+  const [isExpertiseExpanded, setExpertiseExpanded] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const iconMap = {
     '/': HomeIcon,
@@ -40,14 +47,8 @@ function App() {
     '/expertise/add-expertise': MoreTimeIcon,
     '/expertise/all-expertise': ViewTimelineIcon,
   };
+  
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [isProjectsExpanded, setProjectsExpanded] = useState(false);
-  const [isExpertiseExpanded, setExpertiseExpanded] = useState(false);
-  const [projects, setProjects] = useState([]);
-  const [menuItems, setMenuItems] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const handleCategoryChange = async (category) => {
     const response = await axios.get(`http://localhost:8000/projects/${category}`);
@@ -56,10 +57,19 @@ function App() {
   const saveStateToSessionStorage = (params) => {
     sessionStorage.setItem("isProjectsListExpanded", JSON.stringify(params));
   }
+  const saveExpertiseStateToSessionStorage = (params) => {
+    sessionStorage.setItem("isExpertiseListExpanded", JSON.stringify(params));
+  }
   const loadStateToSessionStorage = () => {
     const isExpanded = JSON.parse(sessionStorage.getItem("isProjectsListExpanded"));
     if (isExpanded) {
       setProjectsExpanded(isExpanded);
+    }
+  }
+  const loadExpertiseStateToSessionStorage = () => {
+    const isExpanded = JSON.parse(sessionStorage.getItem("isExpertiseListExpanded"));
+    if (isExpanded) {
+      setExpertiseExpanded(isExpanded);
     }
   }
   const toggleProjectsExpanded = () => {
@@ -68,10 +78,17 @@ function App() {
   };
   const toggleExpertiseExpanded = () => {
     setExpertiseExpanded(!isExpertiseExpanded);
+    saveExpertiseStateToSessionStorage(!isExpertiseExpanded);
   };
   const updateLastVisitedRoute = (route) => {
     sessionStorage.setItem("lastVisitedRoute", route)
   };
+
+  const functionMap = {
+    toggleProjectsExpanded: toggleProjectsExpanded,
+    toggleExpertiseExpanded: toggleExpertiseExpanded,
+  };
+
   useEffect(() => {
     const lastVisitedRoute = sessionStorage.getItem("lastVisitedRoute");
     if (lastVisitedRoute) {
@@ -98,17 +115,12 @@ function App() {
 
   useEffect(() => {
     loadStateToSessionStorage();
+    loadExpertiseStateToSessionStorage();
   }, [menuItems]);
 
   useEffect(() => {
     updateLastVisitedRoute(location.pathname)
   }, [location.pathname])
-
-  const functionMap = {
-    toggleProjectsExpanded: toggleProjectsExpanded,
-    toggleExpertiseExpanded: toggleExpertiseExpanded,
-  };
-
 
   return (
     <div className='App'>
@@ -122,7 +134,11 @@ function App() {
                     <ListItemIcon>
                       <LayersIcon />
                     </ListItemIcon>
-                    <NavLink onClick={() => functionMap[item.onClick]()}>{item.title}</NavLink>
+                    <NavLink
+                      onClick={() => functionMap[item.onClick]()}
+                    >
+                      {item.title}
+                    </NavLink>
                   </ListItemButton>
                   {(item.onClick === "toggleProjectsExpanded" ? isProjectsExpanded : isExpertiseExpanded) && (
                     <ul className='subListItem'>
@@ -147,7 +163,11 @@ function App() {
                   <ListItemIcon>
                     {React.createElement(iconMap[item.path])}
                   </ListItemIcon>
-                  <NavLink to={item.path}>{item.title}</NavLink>
+                  <NavLink
+                    to={item.path}
+                  >
+                    {item.title}
+                  </NavLink>
                 </ListItemButton>
               )}
             </li>
