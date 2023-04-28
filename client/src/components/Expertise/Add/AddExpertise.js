@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
     TextField,
@@ -14,8 +14,8 @@ import {
     InputLabel,
     Button
 } from '@mui/material';
-import * as d3 from 'd3';
-import "./AddExpertise.css"
+import "./AddExpertise.css";
+import D3TimeLine from "./D3TimeLine";
 
 const AddExpertise = () => {
     const [startDate, setStartDate] = useState('');
@@ -23,7 +23,7 @@ const AddExpertise = () => {
     const [loading, setLoading] = useState(false);
     const [projects, setProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState('');
-    const chartRef = useRef(null);
+    const [stages, setStages] = useState([]);
 
     const fetchProjects = async () => {
         try {
@@ -31,6 +31,15 @@ const AddExpertise = () => {
             setProjects(response.data);
         } catch (error) {
             console.error('Error fetching projects:', error);
+        }
+    };
+
+    const fetchStages = async () => {
+        try {
+            const response = await axios.get("http://localhost:8000/stages");
+            setStages(response.data)
+        } catch (error) {
+            console.error("Error fetching stages", error);
         }
     };
 
@@ -110,182 +119,47 @@ const AddExpertise = () => {
         }
     };
 
-    const stages = [
-        {
-            title: 'Дата окончания загрузки ПСД на комплектацию',
-            daysToAdd: 5,
-            calculateStartDate: () => startDate,
-        },
-        {
-            title: 'Дата подписания договора с Экспертизой',
-            daysToAdd: 10,
-            useCalendarDays: true,
-            calculateStartDate: (prevDates) => prevDates[0],
-        },
-        {
-            title: 'Дата оплаты услуг ГЭ по условиям договора',
-            daysToAdd: 2,
-            calculateStartDate: (prevDates) => prevDates[1],
-        },
-        {
-            title: 'Поступление оплаты',
-            daysToAdd: 1,
-            calculateStartDate: (prevDates) => prevDates[2],
-        },
-        {
-            title: 'Дата выдачи мотивированных замечаний',
-            daysToAdd: 20,
-            calculateStartDate: (prevDates) => prevDates[3],
-        },
-        {
-            title: 'Дата выдачи ответов на мотивированные замечания',
-            daysToAdd: 10,
-            calculateStartDate: (prevDates) => prevDates[4],
-        },
-        {
-            title: 'Последний день загрузки технической части',
-            daysToAdd: 35,
-            calculateStartDate: (prevDates) => prevDates[3],
-        },
-        {
-            title: 'Последний день загрузки сметной документации',
-            daysToAdd: 40,
-            calculateStartDate: (prevDates) => prevDates[3],
-        },
-        {
-            title: 'Дата завершения рассмотрения ответов на замечания',
-            daysToAdd: 15,
-            calculateStartDate: (prevDates) => prevDates[5],
-        },
-        {
-            title: 'Дата завершения подготовки и оформления экспертного заключения',
-            daysToAdd: 15,
-            calculateStartDate: (prevDates) => prevDates[5],
-        },
-        {
-            title: 'Дата уведомления о выходе заключения ГЭ',
-            daysToAdd: 45,
-            calculateStartDate: (prevDates) => prevDates[3],
-        },
-    ];
+    const calculateStartDate = (startDateIndex, prevDates) => {
+        if (startDateIndex === null) {
+            return startDate;
+        }
+        return prevDates[startDateIndex];
+    };
 
-    const drawChart = () => {
-        if (!chartRef.current) return;
+    const fetchDates = async () => {
+        if (!startDate) return;
 
-        const data = stages.map((stage, index) => ({
-            name: stage.title,
-            date: new Date(newDates[index]),
-        }));
-
-        const margin = { top: 40, right: 100, bottom: 40, left: 270 };
-        const width = chartRef.current.parentElement.clientWidth - margin.left - margin.right;
-        const height = 500 - margin.top - margin.bottom;
-
-        d3.select(chartRef.current).select('svg').remove();
-
-        const svg = d3
-            .select(chartRef.current)
-            .append('svg')
-            .attr('width', width + margin.left + margin.right)
-            .attr('height', height + margin.top + margin.bottom)
-            .append('g')
-            .attr('transform', `translate(${margin.left},${margin.top})`);
-
-        const x = d3
-            .scaleTime()
-            .domain([
-                d3.min(data, (d) => d.date),
-                d3.max(data, (d) => d.date),
-            ])
-            .range([0, width]);
-
-        const y = d3
-            .scaleBand()
-            .domain(data.map((d) => d.name))
-            .range([0, height])
-            .padding(0.1);
-
-        svg
-            .append('g')
-            .attr('class', 'x-axis')
-            .attr('transform', `translate(0,${height})`)
-            .call(d3.axisBottom(x));
-
-        svg
-            .append('g')
-            .attr('class', 'y-axis')
-            .call(d3.axisLeft(y).tickFormat('')) // Удалите форматирование меток
-            .selectAll('g.tick')
-            .append('foreignObject') // Добавьте foreignObject к каждому элементу
-            .attr('width', 250)
-            .attr('height', y.bandwidth())
-            .attr('x', -260) // Расположение по оси X
-            .attr('y', -y.bandwidth() / 2) // Расположение по оси Y
-            .append('xhtml:div') // Добавьте div внутри foreignObject
-            .attr('style', 'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif; white-space: pre-wrap; width: 250px; text-align: end;')
-            .text((d) => d);
-
-        svg
-            .selectAll('.point')
-            .data(data)
-            .enter()
-            .append('circle')
-            .attr('class', 'point')
-            .attr('cx', (d) => x(d.date))
-            .attr('cy', (d) => y(d.name) + y.bandwidth() / 2)
-            .attr('r', 5)
-            .attr('fill', '#69b3a2');
-        svg
-            .selectAll('.point-label')
-            .data(data)
-            .enter()
-            .append('text')
-            .attr('class', 'point-label')
-            .attr('x', (d) => x(d.date) + 10) // Смещение меток вправо от точек
-            .attr('y', (d) => y(d.name) + y.bandwidth() / 2 + 5) // Смещение меток по вертикали для центрирования
-            .text((d) => d3.timeFormat("%Y-%m-%d")(d.date)) // Форматирование даты
-            .style('font-size', '12px')
-            .style('fill', '#000');
+        setLoading(true);
+        setNewDates([]);
+        let prevDates = [];
+        for (const stage of stages) {
+            try {
+                const startDateForStage = calculateStartDate(stage.startDateIndex, prevDates);
+                const response = await axios.post(
+                    'http://localhost:8000/calculate-date',
+                    {
+                        startDate: startDateForStage,
+                        daysToAdd: stage.daysToAdd,
+                        timeZone: 'Asia/Almaty',
+                        useCalendarDays: stage.useCalendarDays,
+                    }
+                );
+                prevDates.push(response.data.newDate);
+                setNewDates((prevDates) => [...prevDates, response.data.newDate]);
+            } catch (error) {
+                console.error('Error calculating date:', error);
+            }
+        }
+        setLoading(false);
     };
 
     useEffect(() => {
-        const fetchDates = async () => {
-            if (!startDate) return;
-
-            setLoading(true);
-            setNewDates([]);
-            let prevDates = [];
-            for (const stage of stages) {
-                try {
-                    const startDateForStage = stage.calculateStartDate(prevDates);
-                    const response = await axios.post(
-                        'http://localhost:8000/calculate-date',
-                        {
-                            startDate: startDateForStage,
-                            daysToAdd: stage.daysToAdd,
-                            timeZone: 'Asia/Almaty',
-                            useCalendarDays: stage.useCalendarDays,
-                        }
-                    );
-                    prevDates.push(response.data.newDate);
-                    setNewDates((prevDates) => [...prevDates, response.data.newDate]);
-                } catch (error) {
-                    console.error('Error calculating date:', error);
-                }
-            }
-            setLoading(false);
-        };
         fetchDates();
     }, [startDate]);
 
     useEffect(() => {
-        if (newDates.length === stages.length) {
-            drawChart();
-        }
-    }, [newDates]);
-
-    useEffect(() => {
         fetchProjects();
+        fetchStages();
     }, []);
 
     return (
@@ -368,9 +242,11 @@ const AddExpertise = () => {
                     График прохождения экспертизы
                 </Typography>
                 <Grid item mb={4}>
-                    <div className="chart-wrapper">
-                        <div ref={chartRef} />
-                    </div>
+                    {startDate.length > 0 && (
+                        <div className="chart-wrapper">
+                            <D3TimeLine stages={stages} newDates={newDates} />
+                        </div>
+                    )}
                 </Grid>
             </Paper>
         </Container >

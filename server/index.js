@@ -229,6 +229,76 @@ const holidays = [
     // Формат: "YYYY-MM-DD"
 ];
 
+const stages = [
+    {
+        title: 'Дата окончания загрузки ПСД на комплектацию',
+        daysToAdd: 5,
+        startDateIndex: null,
+        // calculateStartDate: () => startDate,
+    },
+    {
+        title: 'Дата подписания договора с Экспертизой',
+        daysToAdd: 10,
+        useCalendarDays: true,
+        startDateIndex: 0,
+        // calculateStartDate: (prevDates) => prevDates[0],
+    },
+    {
+        title: 'Дата оплаты услуг ГЭ по условиям договора',
+        daysToAdd: 2,
+        startDateIndex: 1,
+        // calculateStartDate: (prevDates) => prevDates[1],
+    },
+    {
+        title: 'Поступление оплаты',
+        daysToAdd: 1,
+        startDateIndex: 2,
+        // calculateStartDate: (prevDates) => prevDates[2],
+    },
+    {
+        title: 'Дата выдачи мотивированных замечаний',
+        daysToAdd: 20,
+        startDateIndex: 3,
+        // calculateStartDate: (prevDates) => prevDates[3],
+    },
+    {
+        title: 'Дата выдачи ответов на мотивированные замечания',
+        daysToAdd: 10,
+        startDateIndex: 4,
+        // calculateStartDate: (prevDates) => prevDates[4],
+    },
+    {
+        title: 'Последний день загрузки технической части',
+        daysToAdd: 35,
+        startDateIndex: 3,
+        // calculateStartDate: (prevDates) => prevDates[3],
+    },
+    {
+        title: 'Последний день загрузки сметной документации',
+        daysToAdd: 40,
+        startDateIndex: 3,
+        // calculateStartDate: (prevDates) => prevDates[3],
+    },
+    {
+        title: 'Дата завершения рассмотрения ответов на замечания',
+        daysToAdd: 15,
+        startDateIndex: 5,
+        // calculateStartDate: (prevDates) => prevDates[5],
+    },
+    {
+        title: 'Дата завершения подготовки и оформления экспертного заключения',
+        daysToAdd: 15,
+        startDateIndex: 5,
+        // calculateStartDate: (prevDates) => prevDates[5],
+    },
+    {
+        title: 'Дата уведомления о выходе заключения ГЭ',
+        daysToAdd: 45,
+        startDateIndex: 3,
+        // calculateStartDate: (prevDates) => prevDates[3],
+    },
+];
+
 function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/Almaty") {
     const holidayDates = holidays.map((holiday) => parseISO(holiday));
     let currentDate = startDate;
@@ -252,6 +322,14 @@ app.get("/menu-items", async (req, res) => {
         res.status(200).send(menuItems);
     } catch (error) {
         res.status(500).send({ message: "Error getting menu items" });
+    }
+});
+
+app.get("/stages", async (req, res) => {
+    try {
+        res.status(200).send(stages);
+    } catch (error) {
+        res.status(500).send({ message: "Error getting stages" });
     }
 });
 

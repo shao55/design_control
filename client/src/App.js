@@ -16,7 +16,7 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import MoreTimeIcon from '@mui/icons-material/MoreTime';
 import ViewTimelineIcon from '@mui/icons-material/ViewTimeline';
 
-import Home from './components/Expertise/All/AllExpertise';
+import Home from './components/Home/Home';
 import AddProject from './components/Projects/Add/Add';
 import PerspectiveProjects from './components/Projects/Perspective/Perspective';
 import CurrentProjects from './components/Projects/Current/Current';
@@ -47,7 +47,7 @@ function App() {
     '/expertise/add-expertise': MoreTimeIcon,
     '/expertise/all-expertise': ViewTimelineIcon,
   };
-  
+
 
 
   const handleCategoryChange = async (category) => {
