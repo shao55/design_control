@@ -32,24 +32,30 @@ const menuItems = [
             },
             {
                 id: 2.2,
+                path: "/allProjects",
+                title: "Все проекты",
+                icon: "AddBoxIcon",
+            },
+            {
+                id: 2.3,
                 path: "/projects/perspective",
                 title: "Перспективные",
                 icon: "UpdateIcon",
             },
             {
-                id: 2.3,
+                id: 2.4,
                 path: "/projects/current",
                 title: "Текущие",
                 icon: "WorkIcon",
             },
             {
-                id: 2.4,
+                id: 2.5,
                 path: "/projects/expertise",
                 title: "В экспертизе",
                 icon: "PublishedWithChangesIcon",
             },
             {
-                id: 2.5,
+                id: 2.6,
                 path: "/projects/completed",
                 title: "Завершенные",
                 icon: "DoneIcon",
@@ -83,6 +89,78 @@ const menuItems = [
         ],
     },
 
+];
+const newMenuItems = [
+    {
+        id: 1,
+        path: "/",
+        group: "Main",
+        title: "Главная",
+        icon: "HomeIcon",
+    },
+    {
+        id: 2,
+        path: "/addProject",
+        group: "Projects",
+        title: "Добавить проект",
+        icon: "AddBoxIcon",
+    },
+    {
+        id: 3,
+        path: "/allProjects",
+        group: "Projects",
+        title: "Все проекты",
+        icon: "AddBoxIcon",
+    },
+    {
+        id: 4,
+        path: "/projects/perspective",
+        group: "Projects",
+        title: "Перспективные",
+        icon: "UpdateIcon",
+    },
+    {
+        id: 5,
+        path: "/projects/current",
+        group: "Projects",
+        title: "Текущие",
+        icon: "WorkIcon",
+    },
+    {
+        id: 6,
+        path: "/projects/expertise",
+        group: "Projects",
+        title: "В экспертизе",
+        icon: "PublishedWithChangesIcon",
+    },
+    {
+        id: 7,
+        path: "/projects/completed",
+        group: "Projects",
+        title: "Завершенные",
+        icon: "DoneIcon",
+    },
+    {
+        id: 8,
+        path: "/design-control",
+        group: "Control",
+        title: "Контроль проектирования",
+        icon: "PercentIcon",
+    },
+    {
+        id: 9,
+        path: "/expertise/add-expertise",
+        group: "Expertise",
+        title: "Добавить сроки экспертизы",
+        icon: "MoreTimeIcon",
+    },
+    {
+        id: 10,
+        path: "/expertise/all-expertise",
+        group: "Expertise",
+        title: "Свод сроков экспертизы",
+        icon: "ViewTimelineIcon",
+    },
 ];
 
 const projects = [
@@ -234,70 +312,246 @@ const stages = [
         title: 'Дата окончания загрузки ПСД на комплектацию',
         daysToAdd: 5,
         startDateIndex: null,
-        // calculateStartDate: () => startDate,
     },
     {
         title: 'Дата подписания договора с Экспертизой',
         daysToAdd: 10,
         useCalendarDays: true,
         startDateIndex: 0,
-        // calculateStartDate: (prevDates) => prevDates[0],
     },
     {
         title: 'Дата оплаты услуг ГЭ по условиям договора',
         daysToAdd: 2,
         startDateIndex: 1,
-        // calculateStartDate: (prevDates) => prevDates[1],
     },
     {
         title: 'Поступление оплаты',
         daysToAdd: 1,
         startDateIndex: 2,
-        // calculateStartDate: (prevDates) => prevDates[2],
     },
     {
         title: 'Дата выдачи мотивированных замечаний',
         daysToAdd: 20,
         startDateIndex: 3,
-        // calculateStartDate: (prevDates) => prevDates[3],
     },
     {
         title: 'Дата выдачи ответов на мотивированные замечания',
         daysToAdd: 10,
         startDateIndex: 4,
-        // calculateStartDate: (prevDates) => prevDates[4],
     },
     {
         title: 'Последний день загрузки технической части',
         daysToAdd: 35,
         startDateIndex: 3,
-        // calculateStartDate: (prevDates) => prevDates[3],
     },
     {
         title: 'Последний день загрузки сметной документации',
         daysToAdd: 40,
         startDateIndex: 3,
-        // calculateStartDate: (prevDates) => prevDates[3],
     },
     {
         title: 'Дата завершения рассмотрения ответов на замечания',
         daysToAdd: 15,
         startDateIndex: 5,
-        // calculateStartDate: (prevDates) => prevDates[5],
     },
     {
         title: 'Дата завершения подготовки и оформления экспертного заключения',
         daysToAdd: 15,
         startDateIndex: 5,
-        // calculateStartDate: (prevDates) => prevDates[5],
     },
     {
         title: 'Дата уведомления о выходе заключения ГЭ',
         daysToAdd: 45,
         startDateIndex: 3,
-        // calculateStartDate: (prevDates) => prevDates[3],
     },
 ];
+
+const template = {
+    constructiveGroups: [
+        {
+            name: 'АР',
+            specificWeight: 0.17,
+            comment: "Архитектурные решения",
+            sheets: [
+                {
+                    name: "Общие данные, перечень рабочих проектов, пояснительная записка по АР",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Кладочные/обмерные планы этажей",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Маркировочные планы этажей",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Экспликация полов",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Ведомость заполнения дверных и оконных проемов",
+                    specificWeight: 0.09,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Планы потолка.Узлы и детали потолков",
+                    specificWeight: 0.07,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "План кровли, узлы кровли",
+                    specificWeight: 0.03,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Разрезы здания",
+                    specificWeight: 0.01,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Лестницы, планы и разрезы, объемы и спецификация",
+                    specificWeight: 0.01,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Фасад (ведомость материалов наружной отделки), узлы и детали фасада, спецификация",
+                    specificWeight: 0.09,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Раздел по лифту",
+                    specificWeight: 0.01,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Демонтаж, Перегородки, потолки, полы, окна, двери,спецификация",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Схема наружных внутрених витражей",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Развертка стен, выкросы, навигация",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Узлы деформационных швов",
+                    specificWeight: 0.09,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Узлы лотков и приямков",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Перечень перемычек, спецификация",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Схема усиления стен",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Ведомость отделочных материалов пола, стен, плинтусов",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Крыльцо, узлы и спецификация",
+                    specificWeight: 0.05,
+                    comment: "",
+                    changes: []
+                },
+            ]
+        },
+        {
+            name: 'ГП',
+            specificWeight: 0.08,
+            comment: "Генеральный план",
+            sheets: [
+                {
+                    name: "Общие данные",
+                    specificWeight: 0.09,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Разбивочный план",
+                    specificWeight: 0.22,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "План озеленения",
+                    specificWeight: 0.12,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "План проездов, тротуаров, дорожек, и площадок",
+                    specificWeight: 0.12,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "План расположения МАФ",
+                    specificWeight: 0.1,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "План организации рельефа",
+                    specificWeight: 0.12,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "План земляных масс",
+                    specificWeight: 0.11,
+                    comment: "",
+                    changes: []
+                },
+                {
+                    name: "Конструкции дорожных одежд",
+                    specificWeight: 0.12,
+                    comment: "",
+                    changes: []
+                }
+            ]
+        },
+    ]
+};
 
 function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/Almaty") {
     const holidayDates = holidays.map((holiday) => parseISO(holiday));
@@ -315,7 +569,15 @@ function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/A
     }
 
     return currentDate;
-}
+};
+
+app.get("/template", async (req, res) => {
+    try {
+        res.status(200).send(template);
+    } catch (error) {
+        res.status(500).send({ message: "Error getting template" });
+    }
+});
 
 app.get("/menu-items", async (req, res) => {
     try {

@@ -1,5 +1,5 @@
 import "./Add.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
     Button,
@@ -63,14 +63,14 @@ function AddProject() {
         const newConstructiveGroups = [...project.constructiveGroups];
         newConstructiveGroups[index][name] = value;
         setProject({ ...project, constructiveGroups: newConstructiveGroups });
-        calculateWeights();
+        // calculateWeights();
     };
     const handleSheetChange = (cIndex, sIndex, event) => {
         const { name, value } = event.target;
         const newConstructiveGroups = [...project.constructiveGroups];
         newConstructiveGroups[cIndex].sheets[sIndex][name] = value;
         setProject({ ...project, constructiveGroups: newConstructiveGroups });
-        calculateWeights();
+        // calculateWeights();
     };
     const addConstructive = () => {
         setProject({
@@ -124,6 +124,40 @@ function AddProject() {
             console.error('Ошибка при добавлении проекта:', error);
         }
     };
+
+    const fetchTemplate = async () => {
+        try {
+            const response = await fetch('http://localhost:8000/template', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                return data;
+            } else {
+                console.error('Ошибка при получении шаблона:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Ошибка при получении шаблона:', error);
+        }
+    };
+
+    const applyTemplate = async () => {
+        const template = await fetchTemplate();
+        if (template) {
+            setProject((prevState) => ({
+                ...prevState,
+                constructiveGroups: template.constructiveGroups,
+            }));
+        }
+    };
+
+    useEffect(() => {
+        calculateWeights();
+    })
 
     return (
         <Container>
@@ -255,10 +289,10 @@ function AddProject() {
                                     </Grid>
                                 </Grid>
                             </Grid>
-                            {constructive.sheets.map((sheet, sIndex) => (
-                                <Box key={sIndex} m={2} ml={4}>
-                                    <Paper elevation={8}>
-                                        <Grid container spacing={1} m={2}>
+                            <Box m={2} ml={4}>
+                                <Paper elevation={8}>
+                                    {constructive.sheets.map((sheet, sIndex) => (
+                                        <Grid key={sIndex} container spacing={1} m={2}>
                                             <Grid container spacing={1} pt={2} pb={2} alignItems={"center"}>
                                                 <Grid item xs={12} sm={4}>
                                                     <TextField
@@ -288,7 +322,6 @@ function AddProject() {
                                                         }}
                                                     />
                                                 </Grid>
-
                                                 <Grid item xs={12} sm={4}>
                                                     <TextField
                                                         fullWidth
@@ -306,10 +339,9 @@ function AddProject() {
                                                 </Grid>
                                             </Grid>
                                         </Grid>
-                                    </Paper>
-
-                                </Box>
-                            ))}
+                                    ))}
+                                </Paper>
+                            </Box>
                             <Grid container justifyContent="flex-start" spacing={2} p={2}>
                                 <Grid item>
                                     {totalSheetWeight[cIndex] != null && (
@@ -339,6 +371,15 @@ function AddProject() {
                             startIcon={<AddIcon />}
                         >
                             Добавить конструктив
+                        </Button>
+                    </Grid>
+                    <Grid item>
+                        <Button
+                            onClick={applyTemplate}
+                            variant="contained"
+                            color="secondary"
+                        >
+                            Применить шаблон
                         </Button>
                     </Grid>
                     <Grid item>

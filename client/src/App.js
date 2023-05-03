@@ -15,9 +15,11 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import MoreTimeIcon from '@mui/icons-material/MoreTime';
 import ViewTimelineIcon from '@mui/icons-material/ViewTimeline';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
 import Home from './components/Home/Home';
 import AddProject from './components/Projects/Add/Add';
+import AllProjects from './components/Projects/All/All';
 import PerspectiveProjects from './components/Projects/Perspective/Perspective';
 import CurrentProjects from './components/Projects/Current/Current';
 import ExpertiseProjects from './components/Projects/Expertise/Expertise';
@@ -38,6 +40,7 @@ function App() {
   const iconMap = {
     '/': HomeIcon,
     '/addProject': AddBoxIcon,
+    '/allProjects': AccountTreeIcon,
     '/projects/perspective': UpdateIcon,
     '/projects/current': WorkIcon,
     '/projects/expertise': PublishedWithChangesIcon,
@@ -48,30 +51,28 @@ function App() {
     '/expertise/all-expertise': ViewTimelineIcon,
   };
 
-
-
   const handleCategoryChange = async (category) => {
     const response = await axios.get(`http://localhost:8000/projects/${category}`);
     setProjects(response.data);
   };
   const saveStateToSessionStorage = (params) => {
     sessionStorage.setItem("isProjectsListExpanded", JSON.stringify(params));
-  }
+  };
   const saveExpertiseStateToSessionStorage = (params) => {
     sessionStorage.setItem("isExpertiseListExpanded", JSON.stringify(params));
-  }
+  };
   const loadStateToSessionStorage = () => {
     const isExpanded = JSON.parse(sessionStorage.getItem("isProjectsListExpanded"));
     if (isExpanded) {
       setProjectsExpanded(isExpanded);
     }
-  }
+  };
   const loadExpertiseStateToSessionStorage = () => {
     const isExpanded = JSON.parse(sessionStorage.getItem("isExpertiseListExpanded"));
     if (isExpanded) {
       setExpertiseExpanded(isExpanded);
     }
-  }
+  };
   const toggleProjectsExpanded = () => {
     setProjectsExpanded(!isProjectsExpanded);
     saveStateToSessionStorage(!isProjectsExpanded);
@@ -83,7 +84,6 @@ function App() {
   const updateLastVisitedRoute = (route) => {
     sessionStorage.setItem("lastVisitedRoute", route)
   };
-
   const functionMap = {
     toggleProjectsExpanded: toggleProjectsExpanded,
     toggleExpertiseExpanded: toggleExpertiseExpanded,
@@ -178,6 +178,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/addProject' element={<AddProject />} />
+          <Route path='/allProjects' element={<AllProjects />} />
           <Route path='/projects/perspective' element={<PerspectiveProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
           <Route path='/projects/current' element={<CurrentProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
           <Route path='/projects/expertise' element={<ExpertiseProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
