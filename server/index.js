@@ -11,153 +11,67 @@ app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
 app.use(express.json());
 
-const menuItems = [
+const MenuItems = [
     {
         id: 1,
-        path: "/",
-        title: "Главная",
-        icon: "HomeIcon",
-    },
-    {
-        id: 2,
-        title: "Проекты",
-        icon: "LayersIcon",
-        onClick: "toggleProjectsExpanded",
-        subMenuItems: [
-            {
-                id: 2.1,
-                path: "/addProject",
-                title: "Добавить проект",
-                icon: "AddBoxIcon",
-            },
-            {
-                id: 2.2,
-                path: "/allProjects",
-                title: "Все проекты",
-                icon: "AddBoxIcon",
-            },
-            {
-                id: 2.3,
-                path: "/projects/perspective",
-                title: "Перспективные",
-                icon: "UpdateIcon",
-            },
-            {
-                id: 2.4,
-                path: "/projects/current",
-                title: "Текущие",
-                icon: "WorkIcon",
-            },
-            {
-                id: 2.5,
-                path: "/projects/expertise",
-                title: "В экспертизе",
-                icon: "PublishedWithChangesIcon",
-            },
-            {
-                id: 2.6,
-                path: "/projects/completed",
-                title: "Завершенные",
-                icon: "DoneIcon",
-            },
-        ],
-    },
-    {
-        id: 3,
-        path: "/design-control",
-        title: "Контроль проектирования",
-        icon: "PercentIcon",
-    },
-    {
-        id: 4,
-        title: "Прохождение экспертизы",
-        icon: "LayersIcon",
-        onClick: "toggleExpertiseExpanded",
-        subMenuItems: [
-            {
-                id: 4.1,
-                path: "/expertise/add-expertise",
-                title: "Добавить сроки экспертизы",
-                icon: "MoreTimeIcon",
-            },
-            {
-                id: 4.2,
-                path: "/expertise/all-expertise",
-                title: "Свод сроков экспертизы",
-                icon: "ViewTimelineIcon",
-            },
-        ],
-    },
-
-];
-const newMenuItems = [
-    {
-        id: 1,
-        path: "/",
-        group: "Main",
-        title: "Главная",
-        icon: "HomeIcon",
-    },
-    {
-        id: 2,
         path: "/addProject",
-        group: "Projects",
+        group: "Проекты",
         title: "Добавить проект",
         icon: "AddBoxIcon",
     },
     {
-        id: 3,
+        id: 2,
         path: "/allProjects",
-        group: "Projects",
+        group: "Проекты",
         title: "Все проекты",
-        icon: "AddBoxIcon",
+        icon: "AccountTreeIcon",
     },
     {
-        id: 4,
+        id: 3,
         path: "/projects/perspective",
-        group: "Projects",
+        group: "Проекты",
         title: "Перспективные",
         icon: "UpdateIcon",
     },
     {
-        id: 5,
+        id: 4,
         path: "/projects/current",
-        group: "Projects",
+        group: "Проекты",
         title: "Текущие",
         icon: "WorkIcon",
     },
     {
-        id: 6,
+        id: 5,
         path: "/projects/expertise",
-        group: "Projects",
+        group: "Проекты",
         title: "В экспертизе",
         icon: "PublishedWithChangesIcon",
     },
     {
-        id: 7,
+        id: 6,
         path: "/projects/completed",
-        group: "Projects",
+        group: "Проекты",
         title: "Завершенные",
         icon: "DoneIcon",
     },
     {
-        id: 8,
+        id: 7,
         path: "/design-control",
-        group: "Control",
+        group: "Контроль проектирования",
         title: "Контроль проектирования",
         icon: "PercentIcon",
     },
     {
-        id: 9,
+        id: 8,
         path: "/expertise/add-expertise",
-        group: "Expertise",
+        group: "Прохождение экспертизы",
         title: "Добавить сроки экспертизы",
         icon: "MoreTimeIcon",
     },
     {
-        id: 10,
+        id: 9,
         path: "/expertise/all-expertise",
-        group: "Expertise",
+        group: "Прохождение экспертизы",
         title: "Свод сроков экспертизы",
         icon: "ViewTimelineIcon",
     },
@@ -581,7 +495,7 @@ app.get("/template", async (req, res) => {
 
 app.get("/menu-items", async (req, res) => {
     try {
-        res.status(200).send(menuItems);
+        res.status(200).send(MenuItems);
     } catch (error) {
         res.status(500).send({ message: "Error getting menu items" });
     }

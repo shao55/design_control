@@ -3,16 +3,14 @@ import { NavLink, Route, Routes, useNavigate, useLocation } from 'react-router-d
 import axios from "axios";
 
 import './App.css';
-import { ListItemButton, ListItemIcon, Backdrop, CircularProgress } from '@mui/material';
-import LayersIcon from '@mui/icons-material/Layers';
+import { ListItemButton, ListItemIcon, Backdrop, CircularProgress, Typography, AppBar, Toolbar, Grid, IconButton } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 import UpdateIcon from '@mui/icons-material/Update';
 import WorkIcon from '@mui/icons-material/Work';
 import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import DoneIcon from '@mui/icons-material/Done';
 import PercentIcon from '@mui/icons-material/Percent';
-import TableChartIcon from '@mui/icons-material/TableChart';
-import AddBoxIcon from '@mui/icons-material/AddBox';
 import MoreTimeIcon from '@mui/icons-material/MoreTime';
 import ViewTimelineIcon from '@mui/icons-material/ViewTimeline';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
@@ -29,8 +27,6 @@ import AddExpertise from './components/Expertise/Add/AddExpertise';
 import AllExpertise from './components/Expertise/All/AllExpertise';
 
 function App() {
-  const [isProjectsExpanded, setProjectsExpanded] = useState(false);
-  const [isExpertiseExpanded, setExpertiseExpanded] = useState(false);
   const [projects, setProjects] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,55 +34,26 @@ function App() {
   const location = useLocation();
 
   const iconMap = {
-    '/': HomeIcon,
-    '/addProject': AddBoxIcon,
-    '/allProjects': AccountTreeIcon,
-    '/projects/perspective': UpdateIcon,
-    '/projects/current': WorkIcon,
-    '/projects/expertise': PublishedWithChangesIcon,
-    '/projects/completed': DoneIcon,
-    '/design-control': PercentIcon,
-    '/expertise': TableChartIcon,
-    '/expertise/add-expertise': MoreTimeIcon,
-    '/expertise/all-expertise': ViewTimelineIcon,
+    'HomeIcon': HomeIcon,
+    'AddBoxIcon': AddBoxIcon,
+    'AccountTreeIcon': AccountTreeIcon,
+    'UpdateIcon': UpdateIcon,
+    'WorkIcon': WorkIcon,
+    'PublishedWithChangesIcon': PublishedWithChangesIcon,
+    'DoneIcon': DoneIcon,
+    'PercentIcon': PercentIcon,
+    'MoreTimeIcon': MoreTimeIcon,
+    'ViewTimelineIcon': ViewTimelineIcon,
   };
+
 
   const handleCategoryChange = async (category) => {
     const response = await axios.get(`http://localhost:8000/projects/${category}`);
     setProjects(response.data);
   };
-  const saveStateToSessionStorage = (params) => {
-    sessionStorage.setItem("isProjectsListExpanded", JSON.stringify(params));
-  };
-  const saveExpertiseStateToSessionStorage = (params) => {
-    sessionStorage.setItem("isExpertiseListExpanded", JSON.stringify(params));
-  };
-  const loadStateToSessionStorage = () => {
-    const isExpanded = JSON.parse(sessionStorage.getItem("isProjectsListExpanded"));
-    if (isExpanded) {
-      setProjectsExpanded(isExpanded);
-    }
-  };
-  const loadExpertiseStateToSessionStorage = () => {
-    const isExpanded = JSON.parse(sessionStorage.getItem("isExpertiseListExpanded"));
-    if (isExpanded) {
-      setExpertiseExpanded(isExpanded);
-    }
-  };
-  const toggleProjectsExpanded = () => {
-    setProjectsExpanded(!isProjectsExpanded);
-    saveStateToSessionStorage(!isProjectsExpanded);
-  };
-  const toggleExpertiseExpanded = () => {
-    setExpertiseExpanded(!isExpertiseExpanded);
-    saveExpertiseStateToSessionStorage(!isExpertiseExpanded);
-  };
+
   const updateLastVisitedRoute = (route) => {
     sessionStorage.setItem("lastVisitedRoute", route)
-  };
-  const functionMap = {
-    toggleProjectsExpanded: toggleProjectsExpanded,
-    toggleExpertiseExpanded: toggleExpertiseExpanded,
   };
 
   useEffect(() => {
@@ -104,94 +71,89 @@ function App() {
       try {
         const response = await axios.get("http://localhost:8000/menu-items");
         setMenuItems(response.data);
+        setLoading(false);
       } catch (error) {
         console.error(error);
-      } finally {
-        setLoading(false);
       }
     };
     fetchMenuItems();
   }, []);
 
   useEffect(() => {
-    loadStateToSessionStorage();
-    loadExpertiseStateToSessionStorage();
-  }, [menuItems]);
-
-  useEffect(() => {
     updateLastVisitedRoute(location.pathname)
-  }, [location.pathname])
+  }, [location.pathname]);
+
+  const menuGroups = menuItems.reduce((groups, item) => {
+    if (!groups[item.group]) {
+      groups[item.group] = [];
+    }
+    groups[item.group].push(item);
+    return groups;
+  }, {});
+
+  // xs, extra - small: 0px
+  // sm, small: 600px
+  // md, medium: 900px
+  // lg, large: 1200px
+  // xl, extra - large: 1536px
 
   return (
     <div className='App'>
-      <nav id="sidebar">
-        <ul className='mainListItem'>
-          {menuItems.map((item) => (
-            <li key={item.id}>
-              {item.subMenuItems ? (
-                <div>
-                  <ListItemButton>
+      <Grid container>
+        <Grid item xs={2} sm={4} md={4} lg={3} xl={2} p={1} component="nav" style={{ borderRight: '1px solid rgba(0, 0, 0, 0.12)', boxShadow: '2px 0 4px rgba(0, 0, 0, 0.1)', backgroundColor: '#f5f5f5' }}>
+          <Grid container display={'flex'} justifyContent={'center'} alignItems={'center'} mt={1} mb={1}>
+            <Grid item>
+              <IconButton onClick={() => navigate('/')}>
+                <HomeIcon />
+              </IconButton>
+            </Grid>
+            <Grid>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                <NavLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  Engineering Center
+                </NavLink>
+              </Typography>
+            </Grid>
+          </Grid>
+          <ul style={{ padding: 0, margin: 0, listStyleType: 'none' }}>
+            {Object.entries(menuGroups).map(([group, items]) => (
+              <li key={group}>
+                <Typography variant="caption" pl={1} color={'#938e8c'}>{group}</Typography>
+                {items.map((item) => (
+                  <ListItemButton key={item.id}>
                     <ListItemIcon>
-                      <LayersIcon />
+                      {React.createElement(iconMap[item.icon])}
                     </ListItemIcon>
-                    <NavLink
-                      onClick={() => functionMap[item.onClick]()}
-                    >
-                      {item.title}
-                    </NavLink>
+                    <NavLink to={item.path}>{item.title}</NavLink>
                   </ListItemButton>
-                  {(item.onClick === "toggleProjectsExpanded" ? isProjectsExpanded : isExpertiseExpanded) && (
-                    <ul className='subListItem'>
-                      {item.subMenuItems.map((subItem) => (
-                        <ListItemButton key={subItem.id}>
-                          <ListItemIcon>
-                            {React.createElement(iconMap[subItem.path])}
-                          </ListItemIcon>
-                          <NavLink
-                            onClick={() => handleCategoryChange(subItem.path.split("/").pop())}
-                            to={subItem.path}
-                          >
-                            {subItem.title}
-                          </NavLink>
-                        </ListItemButton>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ) : (
-                <ListItemButton>
-                  <ListItemIcon>
-                    {React.createElement(iconMap[item.path])}
-                  </ListItemIcon>
-                  <NavLink
-                    to={item.path}
-                  >
-                    {item.title}
-                  </NavLink>
-                </ListItemButton>
-              )}
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <main>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/addProject' element={<AddProject />} />
-          <Route path='/allProjects' element={<AllProjects />} />
-          <Route path='/projects/perspective' element={<PerspectiveProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
-          <Route path='/projects/current' element={<CurrentProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
-          <Route path='/projects/expertise' element={<ExpertiseProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
-          <Route path='/projects/completed' element={<CompletedProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
-          <Route path='/design-control' element={<DesignControl />} />
-          <Route path='/expertise/add-expertise' element={<AddExpertise />} />
-          <Route path='/expertise/all-expertise' element={<AllExpertise />} />
-        </Routes>
-      </main>
+                ))}
+              </li>
+            ))}
+          </ul>
+        </Grid>
+        {!loading && (
+          <Grid item xs={10} sm={8} md={8} lg={9} xl={10} p={1} component="main" className="content-wrapper" style={{ overflow: 'auto' }}>
+            <main>
+              <Routes>
+                <Route path='/' element={<Home />} />
+                <Route path='/addProject' element={<AddProject />} />
+                <Route path='/allProjects' element={<AllProjects />} />
+                <Route path='/projects/perspective' element={<PerspectiveProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
+                <Route path='/projects/current' element={<CurrentProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
+                <Route path='/projects/expertise' element={<ExpertiseProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
+                <Route path='/projects/completed' element={<CompletedProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
+                <Route path='/design-control' element={<DesignControl />} />
+                <Route path='/expertise/add-expertise' element={<AddExpertise />} />
+                <Route path='/expertise/all-expertise' element={<AllExpertise />} />
+              </Routes>
+            </main>
+          </Grid>
+        )}
+      </Grid>
       <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <CircularProgress color="inherit" />
       </Backdrop>
-    </div>
+    </div >
   );
 }
 
