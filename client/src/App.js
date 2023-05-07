@@ -3,7 +3,7 @@ import { NavLink, Route, Routes, useNavigate, useLocation } from 'react-router-d
 import axios from "axios";
 
 import './App.css';
-import { ListItemButton, ListItemIcon, Backdrop, CircularProgress, Typography, AppBar, Toolbar, Grid, IconButton } from '@mui/material';
+import { ListItemButton, ListItemIcon, Backdrop, CircularProgress, Typography, Grid, IconButton } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import UpdateIcon from '@mui/icons-material/Update';
@@ -27,7 +27,6 @@ import AddExpertise from './components/Expertise/Add/AddExpertise';
 import AllExpertise from './components/Expertise/All/AllExpertise';
 
 function App() {
-  const [projects, setProjects] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -46,12 +45,6 @@ function App() {
     'ViewTimelineIcon': ViewTimelineIcon,
   };
 
-
-  const handleCategoryChange = async (category) => {
-    const response = await axios.get(`http://localhost:8000/projects/${category}`);
-    setProjects(response.data);
-  };
-
   const updateLastVisitedRoute = (route) => {
     sessionStorage.setItem("lastVisitedRoute", route)
   };
@@ -60,10 +53,6 @@ function App() {
     const lastVisitedRoute = sessionStorage.getItem("lastVisitedRoute");
     if (lastVisitedRoute) {
       navigate(lastVisitedRoute, { replace: true })
-      if (lastVisitedRoute.includes("/projects/")) {
-        const category = lastVisitedRoute.split("/").pop();
-        handleCategoryChange(category);
-      }
     } else {
       navigate('/', { replace: true })
     }
@@ -99,57 +88,59 @@ function App() {
 
   return (
     <div className='App'>
-      <Grid container>
-        <Grid item xs={2} sm={4} md={4} lg={3} xl={2} p={1} component="nav" style={{ borderRight: '1px solid rgba(0, 0, 0, 0.12)', boxShadow: '2px 0 4px rgba(0, 0, 0, 0.1)', backgroundColor: '#f5f5f5' }}>
-          <Grid container display={'flex'} justifyContent={'center'} alignItems={'center'} mt={1} mb={1}>
-            <Grid item>
-              <IconButton onClick={() => navigate('/')}>
-                <HomeIcon />
-              </IconButton>
+      {!loading && (
+        <Grid container>
+          <Grid item xs={2} sm={4} md={4} lg={3} xl={2} p={1} component="nav" style={{ borderRight: '1px solid rgba(0, 0, 0, 0.12)', boxShadow: '2px 0 4px rgba(0, 0, 0, 0.1)', backgroundColor: '#f5f5f5' }}>
+            <Grid container display={'flex'} justifyContent={'center'} alignItems={'center'} mt={1} mb={1}>
+              <Grid item>
+                <IconButton onClick={() => navigate('/')}>
+                  <HomeIcon />
+                </IconButton>
+              </Grid>
+              <Grid>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                  <NavLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    Engineering Center
+                  </NavLink>
+                </Typography>
+              </Grid>
             </Grid>
-            <Grid>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                <NavLink to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  Engineering Center
-                </NavLink>
-              </Typography>
-            </Grid>
+            <ul style={{ padding: 0, margin: 0, listStyleType: 'none' }}>
+              {Object.entries(menuGroups).map(([group, items]) => (
+                <li key={group}>
+                  <Typography variant="caption" pl={1} color={'#938e8c'}>{group}</Typography>
+                  {items.map((item) => (
+                    <ListItemButton key={item.id}>
+                      <ListItemIcon>
+                        {React.createElement(iconMap[item.icon])}
+                      </ListItemIcon>
+                      <NavLink to={item.path}>{item.title}</NavLink>
+                    </ListItemButton>
+                  ))}
+                </li>
+              ))}
+            </ul>
           </Grid>
-          <ul style={{ padding: 0, margin: 0, listStyleType: 'none' }}>
-            {Object.entries(menuGroups).map(([group, items]) => (
-              <li key={group}>
-                <Typography variant="caption" pl={1} color={'#938e8c'}>{group}</Typography>
-                {items.map((item) => (
-                  <ListItemButton key={item.id}>
-                    <ListItemIcon>
-                      {React.createElement(iconMap[item.icon])}
-                    </ListItemIcon>
-                    <NavLink to={item.path}>{item.title}</NavLink>
-                  </ListItemButton>
-                ))}
-              </li>
-            ))}
-          </ul>
+          {!loading && (
+            <Grid item xs={10} sm={8} md={8} lg={9} xl={10} p={1} component="main" className="content-wrapper" style={{ overflow: 'auto' }}>
+              <main>
+                <Routes>
+                  <Route path='/' element={<Home />} />
+                  <Route path='/addProject' element={<AddProject />} />
+                  <Route path='/allProjects' element={<AllProjects />} />
+                  <Route path='/projects/perspective' element={<PerspectiveProjects />} />
+                  <Route path='/projects/current' element={<CurrentProjects />} />
+                  <Route path='/projects/expertise' element={<ExpertiseProjects />} />
+                  <Route path='/projects/completed' element={<CompletedProjects />} />
+                  <Route path='/design-control' element={<DesignControl />} />
+                  <Route path='/expertise/add-expertise' element={<AddExpertise />} />
+                  <Route path='/expertise/all-expertise' element={<AllExpertise />} />
+                </Routes>
+              </main>
+            </Grid>
+          )}
         </Grid>
-        {!loading && (
-          <Grid item xs={10} sm={8} md={8} lg={9} xl={10} p={1} component="main" className="content-wrapper" style={{ overflow: 'auto' }}>
-            <main>
-              <Routes>
-                <Route path='/' element={<Home />} />
-                <Route path='/addProject' element={<AddProject />} />
-                <Route path='/allProjects' element={<AllProjects />} />
-                <Route path='/projects/perspective' element={<PerspectiveProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
-                <Route path='/projects/current' element={<CurrentProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
-                <Route path='/projects/expertise' element={<ExpertiseProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
-                <Route path='/projects/completed' element={<CompletedProjects projects={projects} handleCategoryChange={handleCategoryChange} />} />
-                <Route path='/design-control' element={<DesignControl />} />
-                <Route path='/expertise/add-expertise' element={<AddExpertise />} />
-                <Route path='/expertise/all-expertise' element={<AllExpertise />} />
-              </Routes>
-            </main>
-          </Grid>
-        )}
-      </Grid>
+      )}
       <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <CircularProgress color="inherit" />
       </Backdrop>
