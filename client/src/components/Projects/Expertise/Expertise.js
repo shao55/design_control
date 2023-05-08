@@ -1,5 +1,5 @@
 import "./Expertise.css";
-import { Grid } from "@mui/material";
+import { Grid, Box, Typography, Backdrop, CircularProgress } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from 'react-router-dom';
@@ -7,20 +7,43 @@ import ProjectCard from "../ProjectCard";
 
 function ExpertiseProjects() {
     const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(true);
     const location = useLocation();
 
     useEffect(() => {
         const fetchProjects = async () => {
             const category = location.pathname.split("/").pop();
-            const response = await axios.get(`http://localhost:8000/projects/${category}`);
-            setProjects(response.data);
+            setTimeout(async () => {
+                const response = await axios.get(`http://localhost:8000/projects/${category}`);
+                setProjects(response.data);
+                setLoading(false);
+            }, 1000);
         };
 
         fetchProjects();
     }, [location.pathname]);
 
-    if (!projects) {
-        return <div>Loading...</div>;
+    if (loading) {
+        return (
+            <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
+        )
+    };
+
+    if (projects.length === 0) {
+        return (
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "100vh",
+                }}
+            >
+                <Typography variant="h4">Объекты не добавлены</Typography>
+            </Box>
+        )
     }
 
     return (

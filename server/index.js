@@ -169,37 +169,6 @@ const projects = [
             }
         ]
     },
-    {
-        id: 4,
-        name: 'Обновленный завершенный проект 4 с новой структурой',
-        customer: '',
-        management: '',
-        management: '',
-        designOrganization: '',
-        curator: '',
-        category: 'completed',
-        expertiseDates: [],
-        constructiveGroups: [
-            {
-                name: 'Конструктив 1',
-                specificWeight: 0.25,
-                comment: "Комментарий о конструктиве",
-                sheets: [
-                    {
-                        name: "Лист 1",
-                        specificWeight: 0.1,
-                        comment: "Комментарий о листе",
-                        changes: [
-                            {
-                                readiness: 50,
-                                fixationDate: "12-04-2023"
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
 ];
 
 const holidays = [

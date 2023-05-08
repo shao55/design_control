@@ -8,7 +8,9 @@ import {
     Grid,
     Modal,
     Backdrop,
-    Fade
+    Fade,
+    Button,
+    CardActions
 } from "@mui/material";
 
 const ProjectCard = ({ project }) => {
@@ -32,7 +34,7 @@ const ProjectCard = ({ project }) => {
     const categoryTranslations = {
         current: "Текущий",
         perspective: "Перспективный",
-        expertise: "В Экспертизе",
+        expertise: "В экспертизе",
         completed: "Завершенный",
     };
 
@@ -46,8 +48,7 @@ const ProjectCard = ({ project }) => {
                         <Grid item>
                             <Typography
                                 variant="subtitle1"
-                                style={{ minHeight: "100px", cursor: "pointer" }}
-                                onClick={handleOpen}
+                                style={{ minHeight: "100px" }}
                             >
                                 {project.name}
                             </Typography>
@@ -92,6 +93,11 @@ const ProjectCard = ({ project }) => {
                                     {endDate || "Дата не назначена"}
                                 </Typography>
                             </Typography>
+                            <Box mt={2}>
+                                <CardActions>
+                                    <Button size="small" onClick={handleOpen}>Подробнее</Button>
+                                </CardActions>
+                            </Box>
                         </Grid>
                     </Grid>
                 </CardContent>
@@ -118,7 +124,7 @@ const ProjectCard = ({ project }) => {
                         }}
                     >
                         <h2>{project.name}</h2>
-                        {/* Добавьте дополнительную информацию о проекте */}
+                        {/* Дополнительная информация о проекте */}
                     </div>
                 </Fade>
             </Modal>
