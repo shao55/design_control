@@ -31,6 +31,9 @@ const ProjectCard = ({ project, handleUpdate }) => {
         setOpen(false);
     };
 
+    const onUpdate = () => {
+        handleUpdate();
+    };
 
     const startDate = project.expertiseDates?.[0]?.dates.find(
         (item) => item.stage === "Дата начала загрузки на комплектацию"

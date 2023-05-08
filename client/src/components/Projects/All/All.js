@@ -8,15 +8,15 @@ function AllProjects() {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchProjects = async () => {
-            setTimeout(async () => {
-                const response = await axios.get("http://localhost:8000/allProjects");
-                setProjects(response.data);
-                setLoading(false);
-            }, 1000);
-        };
+    const fetchProjects = async () => {
+        setTimeout(async () => {
+            const response = await axios.get("http://localhost:8000/allProjects");
+            setProjects(response.data);
+            setLoading(false);
+        }, 1000);
+    };
 
+    useEffect(() => {
         fetchProjects();
     }, []);
 
@@ -47,7 +47,7 @@ function AllProjects() {
         <Grid container spacing={2} >
             {projects.map((project) => (
                 <Grid item xs={12} sm={6} md={6} lg={4} xl={3} key={project.id}>
-                    <ProjectCard project={project} />
+                    <ProjectCard project={project} handleUpdate={fetchProjects} />
                 </Grid>
             ))}
         </Grid>
