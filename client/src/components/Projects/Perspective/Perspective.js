@@ -10,16 +10,16 @@ function PerspectiveProjects() {
     const [loading, setLoading] = useState(true);
     const location = useLocation();
 
-    useEffect(() => {
-        const fetchProjects = async () => {
-            const category = location.pathname.split("/").pop();
-            setTimeout(async () => {
-                const response = await axios.get(`http://localhost:8000/projects/${category}`);
-                setProjects(response.data);
-                setLoading(false);
-            }, 1000);
-        };
+    const fetchProjects = async () => {
+        const category = location.pathname.split("/").pop();
+        setTimeout(async () => {
+            const response = await axios.get(`http://localhost:8000/projects/${category}`);
+            setProjects(response.data);
+            setLoading(false);
+        }, 1000);
+    };
 
+    useEffect(() => {
         fetchProjects();
     }, [location.pathname]);
 
@@ -50,7 +50,7 @@ function PerspectiveProjects() {
         <Grid container spacing={2} >
             {projects.map((project) => (
                 <Grid item xs={12} sm={6} md={6} lg={4} xl={3} key={project.id}>
-                    <ProjectCard project={project} />
+                    <ProjectCard project={project} handleUpdate={fetchProjects} />
                 </Grid>
             ))}
 

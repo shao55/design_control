@@ -454,6 +454,22 @@ function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/A
     return currentDate;
 };
 
+app.put("/projects/:id", (req, res) => {
+    const projectId = parseInt(req.params.id);
+    const updatedProject = req.body;
+
+    const projectIndex = projects.findIndex((project) => project.id === projectId);
+
+    if (projectIndex === -1) {
+        res.status(404).send("Проект не найден");
+        return;
+    }
+
+    projects[projectIndex] = updatedProject;
+    res.send(updatedProject);
+});
+
+
 app.get("/template", async (req, res) => {
     try {
         res.status(200).send(template);

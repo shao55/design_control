@@ -12,21 +12,29 @@ import {
     Button,
     CardActions
 } from "@mui/material";
+import EditProjectModal from "./EditProjectModal";
 
-const ProjectCard = ({ project }) => {
+const ProjectCard = ({ project, handleUpdate }) => {
     const [open, setOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] = useState(false);
 
+    const handleEditModalOpen = () => {
+        setEditModalOpen(true);
+    };
+    const handleEditModalClose = () => {
+        setEditModalOpen(false);
+    };
     const handleOpen = () => {
         setOpen(true);
-    }
+    };
     const handleClose = () => {
         setOpen(false);
-    }
+    };
+
 
     const startDate = project.expertiseDates?.[0]?.dates.find(
         (item) => item.stage === "Дата начала загрузки на комплектацию"
     )?.date;
-
     const endDate = project.expertiseDates?.[0]?.dates.find(
         (item) => item.stage === "Дата уведомления о выходе заключения ГЭ"
     )?.date;
@@ -96,6 +104,7 @@ const ProjectCard = ({ project }) => {
                             <Box mt={2}>
                                 <CardActions>
                                     <Button size="small" onClick={handleOpen}>Подробнее</Button>
+                                    <Button size="small" onClick={handleEditModalOpen}>Редактировать</Button>
                                 </CardActions>
                             </Box>
                         </Grid>
@@ -128,6 +137,7 @@ const ProjectCard = ({ project }) => {
                     </div>
                 </Fade>
             </Modal>
+            <EditProjectModal onUpdate={onUpdate} open={editModalOpen} handleClose={handleEditModalClose} project={project} />
         </>
     );
 };
