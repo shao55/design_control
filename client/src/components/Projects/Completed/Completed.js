@@ -1,7 +1,9 @@
 import "./Completed.css";
+import { Grid } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from 'react-router-dom';
+import ProjectCard from "../ProjectCard";
 
 function CompletedProjects() {
     const [projects, setProjects] = useState([]);
@@ -22,13 +24,13 @@ function CompletedProjects() {
     }
 
     return (
-        <div>
-            <ul>
-                {projects.map((project) => (
-                    <li key={project.id}>{project.name}</li>
-                ))}
-            </ul>
-        </div>
+        <Grid container spacing={2} >
+            {projects.map((project) => (
+                <Grid item xs={12} sm={6} md={6} lg={4} xl={3} key={project.id}>
+                    <ProjectCard project={project} />
+                </Grid>
+            ))}
+        </Grid>
     );
 }
 

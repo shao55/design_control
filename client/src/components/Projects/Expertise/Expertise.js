@@ -1,7 +1,9 @@
 import "./Expertise.css";
+import { Grid } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from 'react-router-dom';
+import ProjectCard from "../ProjectCard";
 
 function ExpertiseProjects() {
     const [projects, setProjects] = useState([]);
@@ -18,18 +20,19 @@ function ExpertiseProjects() {
     }, [location.pathname]);
 
     if (!projects) {
-        return <div>Loading. ..</div>;
+        return <div>Loading...</div>;
     }
 
     return (
-        <div>
-            <ul>
-                {projects.map((projects) => (
-                    <li key={projects.id}>{projects.name}</li>
-                ))}
-            </ul>
-        </div>
-    )
+        <Grid container spacing={2} >
+            {projects.map((project) => (
+                <Grid item xs={12} sm={6} md={6} lg={4} xl={3} key={project.id}>
+                    <ProjectCard project={project} />
+                </Grid>
+            ))}
+        </Grid>
+    );
 }
+
 
 export default ExpertiseProjects;

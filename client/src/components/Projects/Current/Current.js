@@ -24,9 +24,9 @@ function CurrentProjects() {
     }
 
     return (
-        <Grid container spacing={2}>
+        <Grid container spacing={2} >
             {projects.map((project) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} xl={4} key={project.id}>
+                <Grid item xs={12} sm={6} md={6} lg={4} xl={3} key={project.id}>
                     <ProjectCard project={project} />
                 </Grid>
             ))}
