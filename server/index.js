@@ -436,6 +436,53 @@ const template = {
     ]
 };
 
+// Найдите проект по ID
+function findProjectById(projectId) {
+    return projects.find(project => project.id === projectId);
+}
+
+// Найдите конструктивную группу по имени
+function findConstructiveGroupByName(project, constructiveGroupName) {
+    return project.constructiveGroups.find(cg => cg.name === constructiveGroupName);
+}
+
+// Найдите лист по имени
+function findSheetByName(constructiveGroup, sheetName) {
+    return constructiveGroup.sheets.find(sheet => sheet.name === sheetName);
+}
+
+// PUT-запрос для обновления данных листа
+app.put('/projects/:projectId/constructiveGroups/:constructiveGroupName/sheets/:sheetName', (req, res) => {
+    const projectId = parseInt(req.params.projectId);
+    const constructiveGroupName = req.params.constructiveGroupName;
+    const sheetName = req.params.sheetName;
+    const updatedSheet = req.body;
+
+    const project = findProjectById(projectId);
+
+    if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+    }
+
+    const constructiveGroup = findConstructiveGroupByName(project, constructiveGroupName);
+
+    if (!constructiveGroup) {
+        return res.status(404).json({ error: 'Constructive group not found' });
+    }
+
+    const sheet = findSheetByName(constructiveGroup, sheetName);
+
+    if (!sheet) {
+        return res.status(404).json({ error: 'Sheet not found' });
+    }
+
+    // Обновите лист с новыми данными
+    Object.assign(sheet, updatedSheet);
+
+    // Отправьте обновленный проект в качестве ответа
+    res.json(project);
+});
+
 function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/Almaty") {
     const holidayDates = holidays.map((holiday) => parseISO(holiday));
     let currentDate = startDate;

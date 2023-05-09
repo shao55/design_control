@@ -22,7 +22,7 @@ import PerspectiveProjects from './components/Projects/Perspective/Perspective';
 import CurrentProjects from './components/Projects/Current/Current';
 import ExpertiseProjects from './components/Projects/Expertise/Expertise';
 import CompletedProjects from './components/Projects/Completed/Completed';
-import DesignControl from './components/DesignControl/DesignControl';
+import DesignControlPage from './components/DesignControl/DesignControlPage';
 import AddExpertise from './components/Expertise/Add/AddExpertise';
 import AllExpertise from './components/Expertise/All/AllExpertise';
 
@@ -132,7 +132,7 @@ function App() {
                   <Route path='/projects/current' element={<CurrentProjects />} />
                   <Route path='/projects/expertise' element={<ExpertiseProjects />} />
                   <Route path='/projects/completed' element={<CompletedProjects />} />
-                  <Route path='/design-control' element={<DesignControl />} />
+                  <Route path='/design-control' element={<DesignControlPage />} />
                   <Route path='/expertise/add-expertise' element={<AddExpertise />} />
                   <Route path='/expertise/all-expertise' element={<AllExpertise />} />
                 </Routes>
