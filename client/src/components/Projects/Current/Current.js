@@ -1,4 +1,3 @@
-import "./Current.css";
 import { Grid, Box, Typography, Backdrop, CircularProgress } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import axios from "axios";

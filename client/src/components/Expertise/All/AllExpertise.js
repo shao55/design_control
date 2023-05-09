@@ -11,7 +11,6 @@ import {
     Typography,
     Container
 } from '@mui/material';
-import './AllExpertise.css';
 
 function AllExpertise() {
     const [projects, setProjects] = useState([]);

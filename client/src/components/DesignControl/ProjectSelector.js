@@ -7,6 +7,7 @@ const ProjectSelector = ({ projects, selectedProjectId, handleProjectChange }) =
             <InputLabel id="project-select-label">Выберите проект</InputLabel>
             <Select
                 labelId="project-select-label"
+                label="Выберите проект"
                 value={selectedProjectId}
                 onChange={handleProjectChange}
             >

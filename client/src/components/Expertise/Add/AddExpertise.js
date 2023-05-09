@@ -14,7 +14,6 @@ import {
     InputLabel,
     Button
 } from '@mui/material';
-import "./AddExpertise.css";
 import D3TimeLine from "./D3TimeLine";
 
 const AddExpertise = () => {

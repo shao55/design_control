@@ -1,4 +1,3 @@
-import "./DesignControlPage.css";
 import React, { useState, useEffect } from 'react';
 import ProjectSelector from './ProjectSelector';
 import ConstructiveGroupList from './ConstructiveGroupList';
@@ -136,20 +135,12 @@ const DesignControlPage = () => {
                     <div className="project-readiness">
                         <h3>Общий % готовности проекта: {calculateProjectReadiness()}%</h3>
                     </div>
-                    {selectedProject.constructiveGroups.map((group) => (
-                        <div
-                            key={group.name}
-                            className={`constructive-group ${selectedGroup?.name === group.name ? 'selected' : ''}`}
-                            onClick={() => handleGroupSelect(group.name)}
-                        >
-                            <div>
-                                <h4>{group.name}</h4>
-                                <p>Удельный вес: {group.specificWeight}</p>
-                                <p>Комментарий: {group.comment}</p>
-                                <p>% готовности: {calculateConstructiveGroupReadiness(group)}%</p>
-                            </div>
-                        </div>
-                    ))}
+                    <ConstructiveGroupList
+                        selectedProject={selectedProject}
+                        selectedGroup={selectedGroup}
+                        calculateConstructiveGroupReadiness={calculateConstructiveGroupReadiness}
+                        handleGroupSelect={handleGroupSelect}
+                    />
                 </>
             )}
 
