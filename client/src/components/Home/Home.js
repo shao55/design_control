@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Grid } from '@mui/material';
+import { Grid, Box } from '@mui/material';
 
 function Home() {
 
@@ -15,12 +15,12 @@ function Home() {
 
         function init() {
             var myMap = new window.ymaps.Map("map", {
-                center: [51.138116, 71.405122], // здесь должны быть координаты вашего офиса
+                center: [51.138116, 71.405122],
                 zoom: 17,
                 controls: []
             });
 
-            var myPlacemark = new window.ymaps.Placemark([51.138116, 71.405122], {}, {}); // здесь должны быть координаты вашего офиса
+            var myPlacemark = new window.ymaps.Placemark([51.138116, 71.405122], {}, {});
             myMap.geoObjects.add(myPlacemark);
         }
 
@@ -30,23 +30,25 @@ function Home() {
     }, []);
 
     return (
-        <div>
-            <h1>Главная страница!</h1>
-            <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                    <div>
-                        <h2>КОНТАКТЫ:</h2>
-                        <p>ТОО «Engineering center ltd»010000, ГСЛ №22008877</p>
-                        <p>Республика Казахстан, Нур-Султан, Қайым Мухамедханова 5 , блок Б, Офис 5-3 , 5-этаж</p>
-                        <p>Почта:engineering_center_ltd@eng-services.kz</p>
-                        <p>Телефон: +7 (7172) 79-64-00</p>
-                    </div>
+        <Box display="flex" flexDirection="column" height="100vh" justifyContent={'space-around'} overflow="auto">
+            <Box>Ваш верхний контент...</Box>
+            <Box>
+                <Grid container spacing={3}>
+                    <Grid item xs={6}>
+                        <div>
+                            <h3>КОНТАКТЫ:</h3>
+                            <p>ТОО «Engineering center ltd»010000, ГСЛ №22008877</p>
+                            <p>Республика Казахстан, Нур-Султан, Қайым Мухамедханова 5 , блок Б, Офис 5-3 , 5-этаж</p>
+                            <p>Почта:engineering_center_ltd@eng-services.kz</p>
+                            <p>Телефон: +7 (7172) 79-64-00</p>
+                        </div>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <div id="map" style={{ width: '100%', height: '200px' }}></div>
+                    </Grid>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                    <div id="map" style={{ width: '100%', height: '200px' }}></div>
-                </Grid>
-            </Grid>
-        </div>
+            </Box>
+        </Box>
     )
 }
 
