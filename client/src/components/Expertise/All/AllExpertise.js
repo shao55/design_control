@@ -38,6 +38,8 @@ function AllExpertise() {
         fetchStages();
     }, [])
 
+    console.log(projects)
+
     return (
         <div>
             <TableContainer component={Paper}>

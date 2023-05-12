@@ -451,7 +451,97 @@ function findSheetByName(constructiveGroup, sheetName) {
     return constructiveGroup.sheets.find(sheet => sheet.name === sheetName);
 }
 
-// PUT-запрос для обновления данных листа
+function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/Almaty") {
+    const holidayDates = holidays.map((holiday) => parseISO(holiday));
+    let currentDate = startDate;
+    let daysAdded = 0;
+
+    while (daysAdded < daysToAdd) {
+        currentDate = addDays(currentDate, 1);
+
+        if (isWeekend(currentDate) || holidayDates.some((holiday) => isSameDay(holiday, currentDate))) {
+            continue;
+        }
+
+        daysAdded++;
+    }
+
+    return currentDate;
+};
+
+app.get('/expertiseDates', async (req, res) => {
+    try {
+        let expertiseDates = [];
+
+        // Перебираем все проекты и добавляем их даты экспертизы в массив
+        projects.forEach(project => {
+            // Проверяем, есть ли даты в проекте
+            if (project.expertiseDates && project.expertiseDates.length > 0) {
+                // Берем последний объект из массива ExpertiseDates
+                const lastExpertiseDateObj = project.expertiseDates[project.expertiseDates.length - 1];
+                // Проверяем, есть ли даты в этом объекте
+                if (lastExpertiseDateObj.dates && lastExpertiseDateObj.dates.length > 0) {
+                    lastExpertiseDateObj.dates.forEach(dateObj => {
+                        // Добавляем информацию о проекте и стадии к каждому объекту даты только если стадия равна 'Дата начала загрузки на комплектацию'
+                        if (dateObj.stage === 'Дата начала загрузки на комплектацию') {
+                            const enrichedDateObj = {
+                                ...dateObj,
+                                projectName: project.name,
+                            };
+                            expertiseDates.push(enrichedDateObj);
+                        }
+                    });
+                }
+            }
+        });
+
+        // Сортируем даты
+        expertiseDates.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        // Фильтруем даты, оставляя только те, которые ещё не наступили
+        const currentDate = new Date();
+        expertiseDates = expertiseDates.filter(expertiseDateObj => new Date(expertiseDateObj.date) > currentDate);
+        // Отправляем только первые 5 объектов
+        expertiseDates = expertiseDates.slice(0, 5);
+        res.json(expertiseDates);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error', error: error.toString() });
+    }
+});
+
+app.get('/changes', async (req, res) => {
+    try {
+        let changes = [];
+
+        projects.forEach(project => {
+            project.constructiveGroups.forEach(group => {
+                group.sheets.forEach(sheet => {
+                    sheet.changes.forEach(change => {
+                        const enrichedChange = {
+                            projectId: project.id,
+                            ...change,
+                            projectName: project.name,
+                            groupId: group.name,
+                            sheetId: sheet.name,
+                        };
+                        changes.push(enrichedChange);
+                    });
+                });
+            });
+        });
+
+        changes.sort((a, b) => new Date(b.fixationDate) - new Date(a.fixationDate));
+        changes = changes.slice(0, 5);
+
+        res.json(changes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error', error: error.toString() });
+    }
+});
+
 app.put('/projects/:projectId/constructiveGroups/:constructiveGroupName/sheets/:sheetName', (req, res) => {
     const projectId = parseInt(req.params.projectId);
     const constructiveGroupName = req.params.constructiveGroupName;
@@ -483,24 +573,6 @@ app.put('/projects/:projectId/constructiveGroups/:constructiveGroupName/sheets/:
     res.json(project);
 });
 
-function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/Almaty") {
-    const holidayDates = holidays.map((holiday) => parseISO(holiday));
-    let currentDate = startDate;
-    let daysAdded = 0;
-
-    while (daysAdded < daysToAdd) {
-        currentDate = addDays(currentDate, 1);
-
-        if (isWeekend(currentDate) || holidayDates.some((holiday) => isSameDay(holiday, currentDate))) {
-            continue;
-        }
-
-        daysAdded++;
-    }
-
-    return currentDate;
-};
-
 app.put("/projects/:id", (req, res) => {
     const projectId = parseInt(req.params.id);
     const updatedProject = req.body;
@@ -515,7 +587,6 @@ app.put("/projects/:id", (req, res) => {
     projects[projectIndex] = updatedProject;
     res.send(updatedProject);
 });
-
 
 app.get("/template", async (req, res) => {
     try {

@@ -90,7 +90,7 @@ function App() {
     <div className='App'>
       {!loading && (
         <Grid container>
-          <Grid item xs={2} sm={4} md={4} lg={3} xl={2} p={1} component="nav" style={{ borderRight: '1px solid rgba(0, 0, 0, 0.12)', boxShadow: '2px 0 4px rgba(0, 0, 0, 0.1)', backgroundColor: '#f5f5f5' }}>
+          <Grid item xs={2} sm={4} md={4} lg={3} xl={2} p={1} component="nav" className="navbar" style={{ borderRight: '1px solid rgba(0, 0, 0, 0.12)', boxShadow: '2px 0 4px rgba(0, 0, 0, 0.1)', backgroundColor: '#f5f5f5' }}>
             <Grid container display={'flex'} justifyContent={'center'} alignItems={'center'} mt={1} mb={1}>
               <Grid item>
                 <IconButton onClick={() => navigate('/')}>
