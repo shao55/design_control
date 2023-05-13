@@ -6,6 +6,7 @@ function Home() {
 
     const [changes, setChanges] = useState([]);
     const [expertiseDates, setExpertiseDates] = useState([]);
+    const [categoryReadiness, setCategoryReadiness] = useState({});
 
     const fetchExpertiseDates = async () => {
         const res = await axios.get('http://localhost:8000/expertiseDates');
@@ -17,12 +18,22 @@ function Home() {
         setChanges(res.data);
     };
 
+    const fetchCategoryReadiness = async () => {
+        try {
+            const response = await axios.get("http://localhost:8000/categoryReadiness");
+            setCategoryReadiness(response.data);
+        } catch (error) {
+            console.error("Ошибка при загрузке данных готовности по категориям:", error);
+        }
+    };
+
     useEffect(() => {
         fetchExpertiseDates();
         fetchChanges();
+        fetchCategoryReadiness();
     }, []);
 
-    console.log(expertiseDates)
+    console.log(categoryReadiness)
 
     // useEffect(() => {
     //     const script = document.createElement("script");
@@ -57,12 +68,13 @@ function Home() {
                     <h1>Добро пожаловать</h1>
                     <p>Здесь вы можете управлять аспектами ваших проектов: слежение за прогрессом и сроками, взаимодействие с графиками, контроль сроков экспертизы</p>
                 </div>
-                {/* <h2>Активные проекты</h2>
+                <h2>Общий % готовности проектов по категориям:</h2>
                 <ul>
-                    <li>Проект А: <a href="/projects/a">перейти к проекту</a></li>
-                    <li>Проект B: <a href="/projects/b">перейти к проекту</a></li>
-                    <li>Проект C: <a href="/projects/c">перейти к проекту</a></li>
-                </ul> */}
+                    <li>Перспективные проекты: {categoryReadiness['perspective'] || 0}%</li>
+                    <li>Текущие проекты: {categoryReadiness['current'] || 0}%</li>
+                    <li>Проекты в экспертизе: {categoryReadiness['expertise'] || 0}%</li>
+                    <li>Завершенные проекты: {categoryReadiness['completed'] || 0}%</li>
+                </ul>
                 <h2>Последние обновления</h2>
                 <ul>
                     {changes.length > 0 ?

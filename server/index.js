@@ -1,4 +1,5 @@
-const express = require("express");
+const express = require('express');
+const mongoose = require('mongoose');
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { addDays, isWeekend, parseISO, isSameDay, format, startOfDay } = require("date-fns");
@@ -6,76 +7,24 @@ const { zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
+require('dotenv').config();
+
+const menuItems = require("./data/MenuItems");
+const holidays = require("./data/holidays");
+const stages = require("./data/stages");
+const template = require("./data/template");
 
 app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
 app.use(express.json());
 
-const MenuItems = [
-    {
-        id: 1,
-        path: "/addProject",
-        group: "Проекты",
-        title: "Добавить проект",
-        icon: "AddBoxIcon",
-    },
-    {
-        id: 2,
-        path: "/allProjects",
-        group: "Проекты",
-        title: "Все проекты",
-        icon: "AccountTreeIcon",
-    },
-    {
-        id: 3,
-        path: "/projects/perspective",
-        group: "Проекты",
-        title: "Перспективные",
-        icon: "UpdateIcon",
-    },
-    {
-        id: 4,
-        path: "/projects/current",
-        group: "Проекты",
-        title: "Текущие",
-        icon: "WorkIcon",
-    },
-    {
-        id: 5,
-        path: "/projects/expertise",
-        group: "Проекты",
-        title: "В экспертизе",
-        icon: "PublishedWithChangesIcon",
-    },
-    {
-        id: 6,
-        path: "/projects/completed",
-        group: "Проекты",
-        title: "Завершенные",
-        icon: "DoneIcon",
-    },
-    {
-        id: 7,
-        path: "/design-control",
-        group: "Контроль проектирования",
-        title: "Контроль проектирования",
-        icon: "PercentIcon",
-    },
-    {
-        id: 8,
-        path: "/expertise/add-expertise",
-        group: "Прохождение экспертизы",
-        title: "Добавить сроки экспертизы",
-        icon: "MoreTimeIcon",
-    },
-    {
-        id: 9,
-        path: "/expertise/all-expertise",
-        group: "Прохождение экспертизы",
-        title: "Свод сроков экспертизы",
-        icon: "ViewTimelineIcon",
-    },
-];
+mongoose
+    .connect(process.env.MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+    .then(() => console.log('MongoDB Connected...'))
+    .catch(err => console.log(err));
 
 let projects = [
     {
@@ -116,325 +65,99 @@ let projects = [
         designOrganization: '',
         curator: '',
         category: 'current',
-        expertiseDates: [],
-        constructiveGroups: [
+        expertiseDates: [
             {
-                name: 'Конструктив 1',
-                specificWeight: 0.25,
-                comment: "Комментарий о конструктиве",
-                sheets: [
+                saveDate: "2023-05-13",
+                dates: [
+                    { stage: 'Дата начала загрузки на комплектацию', date: '2023-05-16' },
+
+                    { stage: 'Дата окончания загрузки ПСД на комплектацию', date: '2023-05-23' }
+2
+:
+{ stage: 'Дата подписания договора с Экспертизой', date: '2023-06-02' }
+3
+:
+{ stage: 'Дата оплаты услуг ГЭ по условиям договора', date: '2023-06-06' }
+4
+:
+{ stage: 'Поступление оплаты', date: '2023-06-07' }
+5
+:
+{ stage: 'Дата выдачи мотивированных замечаний', date: '2023-07-10' }
+6
+:
+{ stage: 'Дата выдачи ответов на мотивированные замечания', date: '2023-07-24' }
+7
+:
+{ stage: 'Последний день загрузки технической части', date: '2023-07-31' }
+8
+:
+{ stage: 'Последний день загрузки сметной документации', date: '2023-08-07' }
+9
+:
+{ stage: 'Дата завершения рассмотрения ответов на замечания', date: '2023-08-14' }
+10
+:
+{ stage: 'Дата завершения подготовки и оформления экспертного заключения', date: '2023-08-14' }
+11
+:
+{ stage: 'Дата уведомления о выходе заключения ГЭ', date: '2023-08-14' }
+                ]
+            }
+        ],
+constructiveGroups: [
+    {
+        name: 'Конструктив 1',
+        specificWeight: 0.25,
+        comment: "Комментарий о конструктиве",
+        sheets: [
+            {
+                name: "Лист 1",
+                specificWeight: 0.1,
+                comment: "Комментарий о листе",
+                changes: [
                     {
-                        name: "Лист 1",
-                        specificWeight: 0.1,
-                        comment: "Комментарий о листе",
-                        changes: [
-                            {
-                                readiness: 50,
-                                fixationDate: "12-04-2023"
-                            }
-                        ]
+                        readiness: 50,
+                        fixationDate: "12-04-2023"
                     }
                 ]
             }
         ]
+    }
+]
     },
-    {
-        id: 3,
+{
+    id: 3,
         name: 'Обновленный проект в экспертизе 3 с новой структурой',
-        customer: '',
-        management: '',
-        management: '',
-        designOrganization: '',
-        curator: '',
-        category: 'expertise',
-        expertiseDates: [],
-        constructiveGroups: [
-            {
-                name: 'Конструктив 1',
-                specificWeight: 0.25,
-                comment: "Комментарий о конструктиве",
-                sheets: [
-                    {
-                        name: "Лист 1",
-                        specificWeight: 0.1,
-                        comment: "Комментарий о листе",
-                        changes: [
-                            {
-                                readiness: 50,
-                                fixationDate: "12-04-2023"
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
+            customer: '',
+                management: '',
+                    management: '',
+                        designOrganization: '',
+                            curator: '',
+                                category: 'expertise',
+                                    expertiseDates: [],
+                                        constructiveGroups: [
+                                            {
+                                                name: 'Конструктив 1',
+                                                specificWeight: 0.25,
+                                                comment: "Комментарий о конструктиве",
+                                                sheets: [
+                                                    {
+                                                        name: "Лист 1",
+                                                        specificWeight: 0.1,
+                                                        comment: "Комментарий о листе",
+                                                        changes: [
+                                                            {
+                                                                readiness: 50,
+                                                                fixationDate: "12-04-2023"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+},
 ];
-
-const holidays = [
-    "2023-01-02",
-    "2023-01-03",
-    "2023-03-08",
-    "2023-03-21",
-    "2023-03-22",
-    "2023-03-23",
-    "2023-05-01",
-    "2023-05-08",
-    "2023-05-09",
-    "2023-06-28",
-    "2023-07-06",
-    "2023-07-07",
-    "2023-08-30",
-    "2023-10-25",
-    "2023-12-18",
-    // Формат: "YYYY-MM-DD"
-];
-
-const stages = [
-    {
-        title: 'Дата окончания загрузки ПСД на комплектацию',
-        daysToAdd: 5,
-        startDateIndex: null,
-    },
-    {
-        title: 'Дата подписания договора с Экспертизой',
-        daysToAdd: 10,
-        useCalendarDays: true,
-        startDateIndex: 0,
-    },
-    {
-        title: 'Дата оплаты услуг ГЭ по условиям договора',
-        daysToAdd: 2,
-        startDateIndex: 1,
-    },
-    {
-        title: 'Поступление оплаты',
-        daysToAdd: 1,
-        startDateIndex: 2,
-    },
-    {
-        title: 'Дата выдачи мотивированных замечаний',
-        daysToAdd: 20,
-        startDateIndex: 3,
-    },
-    {
-        title: 'Дата выдачи ответов на мотивированные замечания',
-        daysToAdd: 10,
-        startDateIndex: 4,
-    },
-    {
-        title: 'Последний день загрузки технической части',
-        daysToAdd: 35,
-        startDateIndex: 3,
-    },
-    {
-        title: 'Последний день загрузки сметной документации',
-        daysToAdd: 40,
-        startDateIndex: 3,
-    },
-    {
-        title: 'Дата завершения рассмотрения ответов на замечания',
-        daysToAdd: 15,
-        startDateIndex: 5,
-    },
-    {
-        title: 'Дата завершения подготовки и оформления экспертного заключения',
-        daysToAdd: 15,
-        startDateIndex: 5,
-    },
-    {
-        title: 'Дата уведомления о выходе заключения ГЭ',
-        daysToAdd: 45,
-        startDateIndex: 3,
-    },
-];
-
-const template = {
-    constructiveGroups: [
-        {
-            name: 'АР',
-            specificWeight: 0.17,
-            comment: "Архитектурные решения",
-            sheets: [
-                {
-                    name: "Общие данные, перечень рабочих проектов, пояснительная записка по АР",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Кладочные/обмерные планы этажей",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Маркировочные планы этажей",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Экспликация полов",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Ведомость заполнения дверных и оконных проемов",
-                    specificWeight: 0.09,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Планы потолка.Узлы и детали потолков",
-                    specificWeight: 0.07,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "План кровли, узлы кровли",
-                    specificWeight: 0.03,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Разрезы здания",
-                    specificWeight: 0.01,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Лестницы, планы и разрезы, объемы и спецификация",
-                    specificWeight: 0.01,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Фасад (ведомость материалов наружной отделки), узлы и детали фасада, спецификация",
-                    specificWeight: 0.09,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Раздел по лифту",
-                    specificWeight: 0.01,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Демонтаж, Перегородки, потолки, полы, окна, двери,спецификация",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Схема наружных внутрених витражей",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Развертка стен, выкросы, навигация",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Узлы деформационных швов",
-                    specificWeight: 0.09,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Узлы лотков и приямков",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Перечень перемычек, спецификация",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Схема усиления стен",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Ведомость отделочных материалов пола, стен, плинтусов",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Крыльцо, узлы и спецификация",
-                    specificWeight: 0.05,
-                    comment: "",
-                    changes: []
-                },
-            ]
-        },
-        {
-            name: 'ГП',
-            specificWeight: 0.08,
-            comment: "Генеральный план",
-            sheets: [
-                {
-                    name: "Общие данные",
-                    specificWeight: 0.09,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Разбивочный план",
-                    specificWeight: 0.22,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "План озеленения",
-                    specificWeight: 0.12,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "План проездов, тротуаров, дорожек, и площадок",
-                    specificWeight: 0.12,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "План расположения МАФ",
-                    specificWeight: 0.1,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "План организации рельефа",
-                    specificWeight: 0.12,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "План земляных масс",
-                    specificWeight: 0.11,
-                    comment: "",
-                    changes: []
-                },
-                {
-                    name: "Конструкции дорожных одежд",
-                    specificWeight: 0.12,
-                    comment: "",
-                    changes: []
-                }
-            ]
-        },
-    ]
-};
 
 // Расчет готовности проекта
 const calculateReadiness = (project) => {
@@ -487,6 +210,31 @@ const getReadinessData = () => {
     return readinessData;
 };
 
+// Расчет общего % готовности проектов по категориям
+const calculateCategoryReadiness = () => {
+    const categories = {
+        'perspective': [],
+        'current': [],
+        'expertise': [],
+        'completed': [],
+    };
+
+    projects.forEach((project) => {
+        const readiness = calculateReadiness(project);
+        categories[project.category].push(parseFloat(readiness));
+    });
+
+    const categoryReadiness = {};
+
+    for (const [category, readinesses] of Object.entries(categories)) {
+        const totalReadiness = readinesses.reduce((a, b) => a + b, 0);
+        const averageReadiness = readinesses.length > 0 ? totalReadiness / readinesses.length : 0;
+        categoryReadiness[category] = averageReadiness.toFixed(2);
+    }
+
+    return categoryReadiness;
+};
+
 // Найдите проект по ID
 function findProjectById(projectId) {
     return projects.find(project => project.id === projectId);
@@ -523,6 +271,11 @@ function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/A
 app.get('/readiness', (req, res) => {
     const readinessData = getReadinessData();
     res.json(readinessData);
+});
+
+app.get('/categoryReadiness', (req, res) => {
+    const categoryReadiness = calculateCategoryReadiness();
+    res.json(categoryReadiness);
 });
 
 app.get('/expertiseDates', async (req, res) => {
@@ -654,7 +407,7 @@ app.get("/template", async (req, res) => {
 
 app.get("/menu-items", async (req, res) => {
     try {
-        res.status(200).send(MenuItems);
+        res.status(200).send(menuItems);
     } catch (error) {
         res.status(500).send({ message: "Error getting menu items" });
     }

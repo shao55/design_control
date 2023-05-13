@@ -106,6 +106,7 @@ const DesignControlPage = () => {
 
             // Fetch the updated readiness data
             fetchReadinessData();
+            console.log(projects);
         } catch (error) {
             console.error(error.message);
         }
