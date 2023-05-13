@@ -14,6 +14,8 @@ const holidays = require("./data/holidays");
 const stages = require("./data/stages");
 const template = require("./data/template");
 
+const Project = require('./models/project');
+
 app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
 app.use(express.json());
@@ -25,139 +27,6 @@ mongoose
     })
     .then(() => console.log('MongoDB Connected...'))
     .catch(err => console.log(err));
-
-let projects = [
-    {
-        id: 1,
-        name: 'Обновленный перспективный проект 1 с новой структурой',
-        customer: '',
-        management: '',
-        designOrganization: '',
-        curator: '',
-        category: 'perspective',
-        expertiseDates: [],
-        constructiveGroups: [
-            {
-                name: 'Конструктив 1',
-                specificWeight: 0.25,
-                comment: "Комментарий о конструктиве",
-                sheets: [
-                    {
-                        name: "Лист 1",
-                        specificWeight: 0.1,
-                        comment: "Комментарий о листе",
-                        changes: [
-                            {
-                                readiness: 50,
-                                fixationDate: "12-04-2023"
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        id: 2,
-        name: 'Обновленный текущий проект 2 с новой структурой',
-        customer: '',
-        management: '',
-        designOrganization: '',
-        curator: '',
-        category: 'current',
-        expertiseDates: [
-            {
-                saveDate: "2023-05-13",
-                dates: [
-                    { stage: 'Дата начала загрузки на комплектацию', date: '2023-05-16' },
-
-                    { stage: 'Дата окончания загрузки ПСД на комплектацию', date: '2023-05-23' }
-2
-:
-{ stage: 'Дата подписания договора с Экспертизой', date: '2023-06-02' }
-3
-:
-{ stage: 'Дата оплаты услуг ГЭ по условиям договора', date: '2023-06-06' }
-4
-:
-{ stage: 'Поступление оплаты', date: '2023-06-07' }
-5
-:
-{ stage: 'Дата выдачи мотивированных замечаний', date: '2023-07-10' }
-6
-:
-{ stage: 'Дата выдачи ответов на мотивированные замечания', date: '2023-07-24' }
-7
-:
-{ stage: 'Последний день загрузки технической части', date: '2023-07-31' }
-8
-:
-{ stage: 'Последний день загрузки сметной документации', date: '2023-08-07' }
-9
-:
-{ stage: 'Дата завершения рассмотрения ответов на замечания', date: '2023-08-14' }
-10
-:
-{ stage: 'Дата завершения подготовки и оформления экспертного заключения', date: '2023-08-14' }
-11
-:
-{ stage: 'Дата уведомления о выходе заключения ГЭ', date: '2023-08-14' }
-                ]
-            }
-        ],
-constructiveGroups: [
-    {
-        name: 'Конструктив 1',
-        specificWeight: 0.25,
-        comment: "Комментарий о конструктиве",
-        sheets: [
-            {
-                name: "Лист 1",
-                specificWeight: 0.1,
-                comment: "Комментарий о листе",
-                changes: [
-                    {
-                        readiness: 50,
-                        fixationDate: "12-04-2023"
-                    }
-                ]
-            }
-        ]
-    }
-]
-    },
-{
-    id: 3,
-        name: 'Обновленный проект в экспертизе 3 с новой структурой',
-            customer: '',
-                management: '',
-                    management: '',
-                        designOrganization: '',
-                            curator: '',
-                                category: 'expertise',
-                                    expertiseDates: [],
-                                        constructiveGroups: [
-                                            {
-                                                name: 'Конструктив 1',
-                                                specificWeight: 0.25,
-                                                comment: "Комментарий о конструктиве",
-                                                sheets: [
-                                                    {
-                                                        name: "Лист 1",
-                                                        specificWeight: 0.1,
-                                                        comment: "Комментарий о листе",
-                                                        changes: [
-                                                            {
-                                                                readiness: 50,
-                                                                fixationDate: "12-04-2023"
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            }
-                                        ]
-},
-];
 
 // Расчет готовности проекта
 const calculateReadiness = (project) => {
@@ -428,15 +297,21 @@ app.get("/projects/:category", (req, res) => {
     console.log("Сработал запрос!");
 });
 
-app.post("/create", (req, res) => {
-    const newProject = req.body;
+app.post("/create", async (req, res) => {
+    const newProjectData = req.body;
 
-    if (newProject && newProject.name) {
-        const maxId = projects.reduce((max, project) => Math.max(max, project.id), 0);
-        newProject.id = maxId + 1;
-        projects.push(newProject);
-        res.status(201).send(newProject);
-        console.log(projects)
+    if (newProjectData && newProjectData.name) {
+        try {
+            const newProject = new Project(newProjectData);
+
+            // Save the new project in the database
+            const savedProject = await newProject.save();
+
+            res.status(201).json(savedProject);
+        } catch (error) {
+            console.log(error); // Add this line
+            res.status(500).send({ message: "Error creating project", error: error.toString() });
+        }
     } else {
         res.status(400).send({ message: "Invalid project data" });
     }
