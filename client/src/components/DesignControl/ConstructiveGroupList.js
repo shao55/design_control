@@ -4,7 +4,7 @@ import { Card, CardContent, Grid, Typography } from '@mui/material';
 const ConstructiveGroupList = ({
   selectedProject,
   selectedGroup,
-  calculateConstructiveGroupReadiness,
+  readinessData,
   handleGroupSelect,
 }) => {
   return (
@@ -29,7 +29,7 @@ const ConstructiveGroupList = ({
                   {group.name}
                 </Typography>
                 <Typography variant="body2">
-                  % готовности: {calculateConstructiveGroupReadiness(group)}%
+                  Готовность группы: {readinessData[group.name] || 0}%
                 </Typography>
                 <Typography variant="body2">
                   Удельный вес: {group.specificWeight}
@@ -43,7 +43,6 @@ const ConstructiveGroupList = ({
         ))}
       </Grid>
     </div>
-
   );
 };
 

@@ -77,7 +77,7 @@ const MenuItems = [
     },
 ];
 
-const projects = [
+let projects = [
     {
         id: 1,
         name: 'Обновленный перспективный проект 1 с новой структурой',
@@ -436,6 +436,57 @@ const template = {
     ]
 };
 
+// Расчет готовности проекта
+const calculateReadiness = (project) => {
+    let totalReadiness = 0;
+    project.constructiveGroups.forEach((group) => {
+        const groupWeight = group.specificWeight;
+        group.sheets.forEach((sheet) => {
+            const sheetWeight = sheet.specificWeight;
+            const sheetReadiness = sheet.changes.length > 0 ? sheet.changes[sheet.changes.length - 1].readiness : 0;
+            totalReadiness += groupWeight * sheetWeight * sheetReadiness;
+        });
+    });
+
+    return totalReadiness.toFixed(2);
+};
+
+// Расчет готовности конструктивов в проекте
+const calculateGroupReadiness = (group) => {
+    let totalReadiness = 0;
+    group.sheets.forEach((sheet) => {
+        const sheetWeight = sheet.specificWeight;
+        const sheetReadiness = sheet.changes.length > 0 ? sheet.changes[sheet.changes.length - 1].readiness : 0;
+        totalReadiness += sheetWeight * sheetReadiness;
+    });
+
+    return totalReadiness.toFixed(2);
+};
+
+// Общая функция расчета и обновления объекта readinessData
+const getReadinessData = () => {
+    let readinessData = {};
+
+    projects.forEach((project) => {
+        const projectId = project.id;
+        readinessData[projectId] = {
+            projectName: project.name,
+            projectReadiness: calculateReadiness(project),
+            groupReadiness: {}
+        };
+
+        project.constructiveGroups.forEach((group) => {
+            const groupId = group.id;
+            readinessData[projectId].groupReadiness[groupId] = {
+                groupName: group.name,
+                groupReadiness: calculateGroupReadiness(group)
+            };
+        });
+    });
+
+    return readinessData;
+};
+
 // Найдите проект по ID
 function findProjectById(projectId) {
     return projects.find(project => project.id === projectId);
@@ -468,6 +519,11 @@ function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/A
 
     return currentDate;
 };
+
+app.get('/readiness', (req, res) => {
+    const readinessData = getReadinessData();
+    res.json(readinessData);
+});
 
 app.get('/expertiseDates', async (req, res) => {
     try {

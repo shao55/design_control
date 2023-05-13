@@ -15,37 +15,25 @@ const DesignControlPage = () => {
     const [selectedSheet, setSelectedSheet] = useState(null);
     const [selectedProjectId, setSelectedProjectId] = useState(null);
     const [selectedConstructiveGroupName, setSelectedConstructiveGroupName] = useState(null);
+    const [readinessData, setReadinessData] = useState({});
 
-    const calculateProjectReadiness = () => {
-        if (!selectedProject) {
-            return 0;
+    const fetchReadinessData = async () => {
+        try {
+            const response = await axios.get("http://localhost:8000/readiness");
+            setReadinessData(response.data);
+        } catch (error) {
+            console.error("Ошибка при загрузке данных готовности:", error);
         }
-        let totalReadiness = 0;
-        selectedProject.constructiveGroups.forEach((group) => {
-            const groupWeight = group.specificWeight;
-
-            group.sheets.forEach((sheet) => {
-                const sheetWeight = sheet.specificWeight;
-                const sheetReadiness = sheet.changes.length > 0 ? sheet.changes[sheet.changes.length - 1].readiness : 0;
-
-                totalReadiness += groupWeight * sheetWeight * sheetReadiness;
-            });
-        });
-
-        return totalReadiness.toFixed(2);
     };
 
-    const calculateConstructiveGroupReadiness = (group) => {
-        let totalReadiness = 0;
-
-        group.sheets.forEach((sheet) => {
-            const sheetWeight = sheet.specificWeight;
-            const sheetReadiness = sheet.changes.length > 0 ? sheet.changes[sheet.changes.length - 1].readiness : 0;
-
-            totalReadiness += sheetWeight * sheetReadiness;
-        });
-
-        return totalReadiness.toFixed(2);
+    const fetchProjects = async () => {
+        try {
+            const response = await axios.get("http://localhost:8000/allProjects");
+            const data = await response.data;
+            setProjects(data);
+        } catch (error) {
+            console.error('Ошибка при загрузке данных проекта:', error);
+        }
     };
 
     const handleProjectChange = (event) => {
@@ -116,22 +104,15 @@ const DesignControlPage = () => {
             setSelectedGroup(findGroup(updatedProject, selectedConstructiveGroupName));
             setSelectedSheet(findSheet(selectedConstructiveGroup, sheetName));
 
+            // Fetch the updated readiness data
+            fetchReadinessData();
         } catch (error) {
             console.error(error.message);
         }
     };
 
     useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const response = await axios.get("http://localhost:8000/allProjects");
-                const data = await response.data;
-                setProjects(data);
-            } catch (error) {
-                console.error('Ошибка при загрузке данных проекта:', error);
-            }
-        };
-
+        fetchReadinessData();
         fetchProjects();
     }, []);
 
@@ -145,12 +126,15 @@ const DesignControlPage = () => {
             {selectedProject && (
                 <>
                     <div className="project-readiness">
-                        <h2>Общий % готовности проекта: {calculateProjectReadiness()}%</h2>
+                        <h2>
+                            Общий % готовности проекта:{" "}
+                            {readinessData[selectedProject.id]?.projectReadiness || 0}%
+                        </h2>
                     </div>
                     <ConstructiveGroupList
                         selectedProject={selectedProject}
                         selectedGroup={selectedGroup}
-                        calculateConstructiveGroupReadiness={calculateConstructiveGroupReadiness}
+                        readinessData={readinessData[selectedProject.id]?.groupReadiness || {}}
                         handleGroupSelect={handleGroupSelect}
                     />
                 </>
