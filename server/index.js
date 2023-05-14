@@ -251,19 +251,35 @@ app.put('/projects/:projectId/constructiveGroups/:constructiveGroupName/sheets/:
     res.json(project);
 });
 
-app.put("/projects/:id", (req, res) => {
-    const projectId = parseInt(req.params.id);
+app.put("/projects/:id", async (req, res) => {
+    const projectId = req.params.id;
     const updatedProject = req.body;
 
-    const projectIndex = projects.findIndex((project) => project.id === projectId);
+    try {
+        const project = await Project.findById(projectId);
 
-    if (projectIndex === -1) {
-        res.status(404).send("Проект не найден");
-        return;
+        if (!project) {
+            return res.status(404).send("Проект не найден");
+        }
+
+        // Обновление полей проекта
+        project.name = updatedProject.name;
+        project.customer = updatedProject.customer;
+        project.management = updatedProject.management;
+        project.designOrganization = updatedProject.designOrganization;
+        project.curator = updatedProject.curator;
+        project.category = updatedProject.category;
+
+        // Здесь вы можете добавить обновление других полей
+
+        // Сохранение обновленного проекта
+        const savedProject = await project.save();
+
+        res.send(savedProject);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Внутренняя ошибка сервера");
     }
-
-    projects[projectIndex] = updatedProject;
-    res.send(updatedProject);
 });
 
 app.get("/template", async (req, res) => {
@@ -290,11 +306,17 @@ app.get("/stages", async (req, res) => {
     }
 });
 
-app.get("/projects/:category", (req, res) => {
+app.get("/projects/:category", async (req, res) => {
     const category = req.params.category;
-    const filteredProjects = projects.filter(p => p.category === category);
-    res.json(filteredProjects);
-    console.log("Сработал запрос!");
+
+    try {
+        const filteredProjects = await Project.find({ category: category });
+        console.log("Сработал запрос!");
+        res.json(filteredProjects);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: "Internal Server Error" });
+    }
 });
 
 app.post("/create", async (req, res) => {
@@ -339,29 +361,40 @@ app.post("/calculate-date", (req, res) => {
     res.status(200).send({ newDate: formattedNewDate });
 });
 
-app.get("/allProjects", (req, res) => {
-    res.json(projects);
-    console.log("Запрос списка всех проектов");
+app.get("/allProjects", async (req, res) => {
+    try {
+        const projects = await Project.find({});
+        console.log("Запрос списка всех проектов");
+        res.json(projects);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: "Internal Server Error" });
+    }
 });
 
-app.post("/update-project-dates", (req, res) => {
+app.post("/update-project-dates", async (req, res) => {
     const { projectId, expertiseDates } = req.body;
 
     if (!projectId || !expertiseDates) {
         return res.status(400).send({ message: "Invalid input" });
     }
 
-    const projectIndex = projects.findIndex((project) => project.id === projectId);
-
-    if (projectIndex !== -1) {
-        projects[projectIndex].expertiseDates = expertiseDates;
-        res.status(200).send({ message: "Project dates updated successfully" });
-        console.log(projects)
-    } else {
-        res.status(404).send({ message: "Project not found" });
+    try {
+        const project = await Project.findById(projectId);
+        if (project) {
+            project.expertiseDates = expertiseDates;
+            await project.save();
+            res.status(200).send({ message: "Project dates updated successfully" });
+            console.log(project)
+        } else {
+            res.status(404).send({ message: "Project not found" });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Server error: " + error.message });
     }
 });
 
 app.listen(PORT, () => {
-    console.log(`Server listening on ${PORT}`);
+    console.log(`Server listening on ${PORT}...`);
 });

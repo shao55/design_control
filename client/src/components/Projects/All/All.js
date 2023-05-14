@@ -45,7 +45,7 @@ function AllProjects() {
     return (
         <Grid container spacing={2} >
             {projects.map((project) => (
-                <Grid item xs={12} sm={6} md={6} lg={4} xl={3} key={project.id}>
+                <Grid item xs={12} sm={6} md={6} lg={4} xl={3} key={project._id}>
                     <ProjectCard project={project} handleUpdate={fetchProjects} />
                 </Grid>
             ))}

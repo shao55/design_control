@@ -35,12 +35,18 @@ const ProjectCard = ({ project, handleUpdate }) => {
         handleUpdate();
     };
 
-    const startDate = project.expertiseDates?.[0]?.dates.find(
+    const formatIsoDate = (dateString) => {
+        if (!dateString) return "Дата не назначена";
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+    };
+
+    const startDate = formatIsoDate(project.expertiseDates?.[0]?.dates.find(
         (item) => item.stage === "Дата начала загрузки на комплектацию"
-    )?.date;
-    const endDate = project.expertiseDates?.[0]?.dates.find(
+    )?.date);
+    const endDate = formatIsoDate(project.expertiseDates?.[0]?.dates.find(
         (item) => item.stage === "Дата уведомления о выходе заключения ГЭ"
-    )?.date;
+    )?.date);
 
     const categoryTranslations = {
         current: "Текущий",
@@ -70,38 +76,38 @@ const ProjectCard = ({ project, handleUpdate }) => {
                         <Grid item>
                             <Typography variant="body2" color="textSecondary">
                                 Заказчик:&nbsp;
-                                <Typography color={"black"} display={"inline"} variant="body2">
+                                <Typography component="span" color={"black"} display={"inline"} variant="body2">
                                     {project.customer || "Не назначено"}
                                 </Typography>
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
                                 Управление:&nbsp;
-                                <Typography color={"black"} display={"inline"} variant="body2">
+                                <Typography component="span" color={"black"} display={"inline"} variant="body2">
                                     {project.management || "Не назначено"}
                                 </Typography>
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
                                 Проектная организация:&nbsp;
-                                <Typography color={"black"} display={"inline"} variant="body2">
+                                <Typography component="span" color={"black"} display={"inline"} variant="body2">
                                     {project.designOrganization || "Не назначено"}
                                 </Typography>
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
                                 Куратор:&nbsp;
-                                <Typography color={"black"} display={"inline"} variant="body2">
+                                <Typography component="span" color={"black"} display={"inline"} variant="body2">
                                     {project.curator || "Не назначено"}
                                 </Typography>
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
                                 Дата начала загрузки на комплектацию:&nbsp;
-                                <Typography color={"black"} display={"inline"} variant="body2">
-                                    {startDate || "Дата не назначена"}
+                                <Typography component="span" color={"black"} display={"inline"} variant="body2">
+                                    {startDate}
                                 </Typography>
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
                                 Дата уведомления о выходе заключения ГЭ:&nbsp;
-                                <Typography color={"black"} display={"inline"} variant="body2">
-                                    {endDate || "Дата не назначена"}
+                                <Typography component="span" color={"black"} display={"inline"} variant="body2">
+                                    {endDate}
                                 </Typography>
                             </Typography>
                             <Box mt={2}>

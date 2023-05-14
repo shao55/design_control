@@ -17,7 +17,7 @@ const EditProjectModal = ({ open, handleClose, project, onUpdate }) => {
 
     const handleSave = async () => {
         try {
-            await axios.put(`http://localhost:8000/projects/${project.id}`, updatedProject);
+            await axios.put(`http://localhost:8000/projects/${project._id}`, updatedProject);
             onUpdate();
             handleClose();
         } catch (error) {

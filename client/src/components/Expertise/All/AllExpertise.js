@@ -59,7 +59,7 @@ function AllExpertise() {
                         {projects
                             .filter((project) => project.expertiseDates && project.expertiseDates.length > 0)
                             .map((project) => (
-                                <TableRow key={project.id}>
+                                <TableRow key={project._id}>
                                     <TableCell component="th" scope="row">
                                         {project.name}
                                     </TableCell>
@@ -67,7 +67,7 @@ function AllExpertise() {
                                     {project.expertiseDates[project.expertiseDates.length - 1].dates.map(
                                         (dateObj, index) => (
                                             <TableCell key={index} align="right">
-                                                {dateObj.date}
+                                                {new Date(dateObj.date).toISOString().slice(0, 10)}
                                             </TableCell>
                                         )
                                     )}

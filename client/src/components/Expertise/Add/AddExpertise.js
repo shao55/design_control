@@ -43,7 +43,7 @@ const AddExpertise = () => {
     };
 
     const findLatestStartDate = (projectId) => {
-        const project = projects.find((project) => project.id === projectId);
+        const project = projects.find((project) => project._id === projectId);
         if (project && project.expertiseDates.length > 0) {
             const latestExpertiseDate = project.expertiseDates.reduce((prev, curr) =>
                 prev.saveDate > curr.saveDate ? prev : curr
@@ -52,7 +52,7 @@ const AddExpertise = () => {
                 (dateObj) => dateObj.stage === "Дата начала загрузки на комплектацию"
             );
             if (startDateObj) {
-                return startDateObj.date;
+                return new Date(startDateObj.date).toISOString().split('T')[0]; // тут мы преобразовываем дату
             }
         }
         return "";
@@ -90,7 +90,7 @@ const AddExpertise = () => {
         };
         // Обновляем массив expertiseDates выбранного проекта
         const updatedExpertiseDates = [
-            ...projects.find((project) => project.id === selectedProject).expertiseDates,
+            ...projects.find((project) => project._id === selectedProject).expertiseDates,
             newExpertiseDate,
         ];
         // Отправляем данные на бэкенд для обновления
@@ -178,7 +178,7 @@ const AddExpertise = () => {
                                 onChange={handleProjectSelect}
                             >
                                 {projects.map((project) => (
-                                    <MenuItem key={project.id} value={project.id}>
+                                    <MenuItem key={project._id} value={project._id}>
                                         {project.name}
                                     </MenuItem>
                                 ))}
