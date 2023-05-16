@@ -76,7 +76,7 @@ const AddExpertise = () => {
             return;
         }
         const newExpertiseDate = {
-            saveDate: new Date().toISOString().slice(0, 10), // текущая дата сохранения
+            saveDate: new Date().toISOString(), // текущая дата сохранения
             dates: [
                 {
                     stage: "Дата начала загрузки на комплектацию",

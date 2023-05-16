@@ -80,7 +80,7 @@ const DesignControlPage = () => {
 
             const newChange = {
                 readiness,
-                fixationDate: new Date().toISOString().slice(0, 10),
+                fixationDate: new Date().toISOString()
             };
 
             // Add the new change to the sheet's changes array
