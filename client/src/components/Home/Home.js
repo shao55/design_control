@@ -10,11 +10,13 @@ function Home() {
 
     const fetchExpertiseDates = async () => {
         const res = await axios.get('http://localhost:8000/expertiseDates');
+        console.log(res.data);
         setExpertiseDates(res.data);
     };
 
     const fetchChanges = async () => {
         const res = await axios.get('http://localhost:8000/changes');
+        console.log(res.data);
         setChanges(res.data);
     };
 
@@ -32,8 +34,6 @@ function Home() {
         fetchChanges();
         fetchCategoryReadiness();
     }, []);
-
-    console.log(categoryReadiness)
 
     // useEffect(() => {
     //     const script = document.createElement("script");

@@ -28,21 +28,25 @@ mongoose
     .then(() => console.log('MongoDB Connected...'))
     .catch(err => console.log(err));
 
+
 // Расчет готовности проекта
-const calculateReadiness = (project) => {
+const calculateReadiness = async (projectId) => {
     let totalReadiness = 0;
-    project.constructiveGroups.forEach((group) => {
-        const groupWeight = group.specificWeight;
-        group.sheets.forEach((sheet) => {
-            const sheetWeight = sheet.specificWeight;
-            const sheetReadiness = sheet.changes.length > 0 ? sheet.changes[sheet.changes.length - 1].readiness : 0;
-            totalReadiness += groupWeight * sheetWeight * sheetReadiness;
+    const project = await Project.findById(projectId);
+
+    if (project) {
+        project.constructiveGroups.forEach((group) => {
+            const groupWeight = group.specificWeight;
+            group.sheets.forEach((sheet) => {
+                const sheetWeight = sheet.specificWeight;
+                const sheetReadiness = sheet.changes.length > 0 ? sheet.changes[sheet.changes.length - 1].readiness : 0;
+                totalReadiness += groupWeight * sheetWeight * sheetReadiness;
+            });
         });
-    });
+    }
 
     return totalReadiness.toFixed(2);
 };
-
 // Расчет готовности конструктивов в проекте
 const calculateGroupReadiness = (group) => {
     let totalReadiness = 0;
@@ -54,33 +58,42 @@ const calculateGroupReadiness = (group) => {
 
     return totalReadiness.toFixed(2);
 };
-
 // Общая функция расчета и обновления объекта readinessData
-const getReadinessData = () => {
+const getReadinessData = async () => {
     let readinessData = {};
+    const projects = await Project.find();
 
-    projects.forEach((project) => {
-        const projectId = project.id;
+    for (const project of projects) {
+        const projectId = project._id.toString();
         readinessData[projectId] = {
             projectName: project.name,
-            projectReadiness: calculateReadiness(project),
+            projectReadiness: await calculateReadiness(projectId),
             groupReadiness: {}
         };
 
         project.constructiveGroups.forEach((group) => {
-            const groupId = group.id;
+            const groupId = group._id.toString();
             readinessData[projectId].groupReadiness[groupId] = {
                 groupName: group.name,
                 groupReadiness: calculateGroupReadiness(group)
             };
         });
-    });
+    }
 
     return readinessData;
 };
 
+app.get('/readiness', async (req, res) => {
+    try {
+        const readinessData = await getReadinessData();
+        res.json(readinessData);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error', error: error.toString() });
+    }
+});
 // Расчет общего % готовности проектов по категориям
-const calculateCategoryReadiness = () => {
+const calculateCategoryReadiness = async () => {
     const categories = {
         'perspective': [],
         'current': [],
@@ -88,10 +101,12 @@ const calculateCategoryReadiness = () => {
         'completed': [],
     };
 
-    projects.forEach((project) => {
-        const readiness = calculateReadiness(project);
+    const projects = await Project.find({}); // Получение всех проектов из базы данных
+
+    await Promise.all(projects.map(async (project) => {
+        const readiness = await calculateReadiness(project._id); // Убедитесь, что calculateReadiness возвращает промис
         categories[project.category].push(parseFloat(readiness));
-    });
+    }));
 
     const categoryReadiness = {};
 
@@ -104,46 +119,8 @@ const calculateCategoryReadiness = () => {
     return categoryReadiness;
 };
 
-// Найдите проект по ID
-function findProjectById(projectId) {
-    return projects.find(project => project.id === projectId);
-}
-
-// Найдите конструктивную группу по имени
-function findConstructiveGroupByName(project, constructiveGroupName) {
-    return project.constructiveGroups.find(cg => cg.name === constructiveGroupName);
-}
-
-// Найдите лист по имени
-function findSheetByName(constructiveGroup, sheetName) {
-    return constructiveGroup.sheets.find(sheet => sheet.name === sheetName);
-}
-
-function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/Almaty") {
-    const holidayDates = holidays.map((holiday) => parseISO(holiday));
-    let currentDate = startDate;
-    let daysAdded = 0;
-
-    while (daysAdded < daysToAdd) {
-        currentDate = addDays(currentDate, 1);
-
-        if (isWeekend(currentDate) || holidayDates.some((holiday) => isSameDay(holiday, currentDate))) {
-            continue;
-        }
-
-        daysAdded++;
-    }
-
-    return currentDate;
-};
-
-app.get('/readiness', (req, res) => {
-    const readinessData = getReadinessData();
-    res.json(readinessData);
-});
-
-app.get('/categoryReadiness', (req, res) => {
-    const categoryReadiness = calculateCategoryReadiness();
+app.get('/categoryReadiness', async (req, res) => {
+    const categoryReadiness = await calculateCategoryReadiness(); // calculateCategoryReadiness теперь асинхронная функция
     res.json(categoryReadiness);
 });
 
@@ -151,16 +128,13 @@ app.get('/expertiseDates', async (req, res) => {
     try {
         let expertiseDates = [];
 
-        // Перебираем все проекты и добавляем их даты экспертизы в массив
+        const projects = await Project.find({});
+
         projects.forEach(project => {
-            // Проверяем, есть ли даты в проекте
             if (project.expertiseDates && project.expertiseDates.length > 0) {
-                // Берем последний объект из массива ExpertiseDates
                 const lastExpertiseDateObj = project.expertiseDates[project.expertiseDates.length - 1];
-                // Проверяем, есть ли даты в этом объекте
                 if (lastExpertiseDateObj.dates && lastExpertiseDateObj.dates.length > 0) {
                     lastExpertiseDateObj.dates.forEach(dateObj => {
-                        // Добавляем информацию о проекте и стадии к каждому объекту даты только если стадия равна 'Дата начала загрузки на комплектацию'
                         if (dateObj.stage === 'Дата начала загрузки на комплектацию') {
                             const enrichedDateObj = {
                                 ...dateObj,
@@ -173,13 +147,9 @@ app.get('/expertiseDates', async (req, res) => {
             }
         });
 
-        // Сортируем даты
         expertiseDates.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        // Фильтруем даты, оставляя только те, которые ещё не наступили
         const currentDate = new Date();
         expertiseDates = expertiseDates.filter(expertiseDateObj => new Date(expertiseDateObj.date) > currentDate);
-        // Отправляем только первые 5 объектов
         expertiseDates = expertiseDates.slice(0, 5);
         res.json(expertiseDates);
 
@@ -193,13 +163,15 @@ app.get('/changes', async (req, res) => {
     try {
         let changes = [];
 
+        const projects = await Project.find({});
+
         projects.forEach(project => {
             project.constructiveGroups.forEach(group => {
                 group.sheets.forEach(sheet => {
                     sheet.changes.forEach(change => {
                         const enrichedChange = {
-                            projectId: project.id,
-                            ...change,
+                            projectId: project._id.toString(),
+                            ...change.toObject(), // this is important
                             projectName: project.name,
                             groupId: group.name,
                             sheetId: sheet.name,
@@ -210,9 +182,9 @@ app.get('/changes', async (req, res) => {
             });
         });
 
-        changes.sort((a, b) => new Date(b.fixationDate) - new Date(a.fixationDate));
-        changes = changes.slice(0, 5);
+        // changes = changes.slice(-5);
 
+        console.log(changes)
         res.json(changes);
     } catch (error) {
         console.error(error);
@@ -220,35 +192,41 @@ app.get('/changes', async (req, res) => {
     }
 });
 
-app.put('/projects/:projectId/constructiveGroups/:constructiveGroupName/sheets/:sheetName', (req, res) => {
-    const projectId = parseInt(req.params.projectId);
+app.put('/projects/:projectId/constructiveGroups/:constructiveGroupName/sheets/:sheetName', async (req, res) => {
+    const projectId = req.params.projectId;
     const constructiveGroupName = req.params.constructiveGroupName;
     const sheetName = req.params.sheetName;
     const updatedSheet = req.body;
 
-    const project = findProjectById(projectId);
+    try {
+        const project = await Project.findById(projectId);
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
 
-    if (!project) {
-        return res.status(404).json({ error: 'Project not found' });
+        const constructiveGroup = project.constructiveGroups.find(cg => cg.name === constructiveGroupName);
+        if (!constructiveGroup) {
+            return res.status(404).json({ error: 'Constructive group not found' });
+        }
+
+        const sheet = constructiveGroup.sheets.find(sheet => sheet.name === sheetName);
+        if (!sheet) {
+            return res.status(404).json({ error: 'Sheet not found' });
+        }
+
+        // Обновите лист с новыми данными
+        Object.assign(sheet, updatedSheet);
+
+        // Сохраните обновленный проект
+        await project.save();
+
+        // Отправьте обновленный проект в качестве ответа
+        res.json(project);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error', error: error.toString() });
     }
-
-    const constructiveGroup = findConstructiveGroupByName(project, constructiveGroupName);
-
-    if (!constructiveGroup) {
-        return res.status(404).json({ error: 'Constructive group not found' });
-    }
-
-    const sheet = findSheetByName(constructiveGroup, sheetName);
-
-    if (!sheet) {
-        return res.status(404).json({ error: 'Sheet not found' });
-    }
-
-    // Обновите лист с новыми данными
-    Object.assign(sheet, updatedSheet);
-
-    // Отправьте обновленный проект в качестве ответа
-    res.json(project);
 });
 
 app.put("/projects/:id", async (req, res) => {
@@ -338,6 +316,24 @@ app.post("/create", async (req, res) => {
         res.status(400).send({ message: "Invalid project data" });
     }
 });
+
+function addBusinessDays(startDate, daysToAdd, holidays = [], timeZone = "Asia/Almaty") {
+    const holidayDates = holidays.map((holiday) => parseISO(holiday));
+    let currentDate = startDate;
+    let daysAdded = 0;
+
+    while (daysAdded < daysToAdd) {
+        currentDate = addDays(currentDate, 1);
+
+        if (isWeekend(currentDate) || holidayDates.some((holiday) => isSameDay(holiday, currentDate))) {
+            continue;
+        }
+
+        daysAdded++;
+    }
+
+    return currentDate;
+};
 
 app.post("/calculate-date", (req, res) => {
     const { startDate, daysToAdd, timeZone, useCalendarDays } = req.body;

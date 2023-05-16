@@ -7,6 +7,7 @@ const ConstructiveGroupList = ({
   readinessData,
   handleGroupSelect,
 }) => {
+  console.log(readinessData);
   return (
     <div>
       <h2>Конструктивы</h2>
@@ -29,7 +30,7 @@ const ConstructiveGroupList = ({
                   {group.name}
                 </Typography>
                 <Typography variant="body2">
-                  Готовность группы: {readinessData[group.name] || 0}%
+                  Готовность группы: {readinessData[group._id]?.groupReadiness || 0}%
                 </Typography>
                 <Typography variant="body2">
                   Удельный вес: {group.specificWeight}

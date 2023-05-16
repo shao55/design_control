@@ -12,7 +12,7 @@ const ProjectSelector = ({ projects, selectedProjectId, handleProjectChange }) =
                 onChange={handleProjectChange}
             >
                 {projects.map((project) => (
-                    <MenuItem key={project.id} value={project.id}>
+                    <MenuItem key={project._id} value={project._id}>
                         {project.name}
                     </MenuItem>
                 ))}

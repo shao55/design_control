@@ -37,9 +37,9 @@ const DesignControlPage = () => {
     };
 
     const handleProjectChange = (event) => {
-        const projectId = parseInt(event.target.value);
+        const projectId = event.target.value; // избавляемся от parseInt
         setSelectedProjectId(projectId);
-        setSelectedProject(projects.find((project) => project.id === projectId));
+        setSelectedProject(projects.find((project) => project._id === projectId)); // используйте _id
         setSelectedGroup(null);
         setSelectedSheet(null);
     };
@@ -54,7 +54,7 @@ const DesignControlPage = () => {
         setSelectedSheet(sheet);
     };
 
-    const findProject = (projectId) => projects.find((project) => project.id === projectId);
+    const findProject = (projectId) => projects.find((project) => project._id === projectId); // используйте _id
     const findGroup = (project, groupName) => project.constructiveGroups.find((group) => group.name === groupName);
     const findSheet = (group, sheetName) => group.sheets.find((sheet) => sheet.name === sheetName);
 
@@ -87,7 +87,7 @@ const DesignControlPage = () => {
             selectedSheet.changes.push(newChange);
 
             const response = await axios.put(
-                `http://localhost:8000/projects/${selectedProject.id}/constructiveGroups/${selectedConstructiveGroupName}/sheets/${sheetName}`,
+                `http://localhost:8000/projects/${selectedProject._id}/constructiveGroups/${selectedConstructiveGroupName}/sheets/${sheetName}`, // используйте _id
                 selectedSheet
             );
 
@@ -95,7 +95,7 @@ const DesignControlPage = () => {
             const updatedProject = response.data;
             setProjects(
                 projects.map((project) =>
-                    project.id === updatedProject.id ? updatedProject : project
+                    project._id === updatedProject._id ? updatedProject : project // используйте _id
                 )
             );
 
@@ -121,7 +121,7 @@ const DesignControlPage = () => {
         <div>
             <ProjectSelector
                 projects={projects}
-                selectedProjectId={selectedProject?.id || ''}
+                selectedProjectId={selectedProject?._id || ''}
                 handleProjectChange={handleProjectChange}
             />
             {selectedProject && (
@@ -129,13 +129,13 @@ const DesignControlPage = () => {
                     <div className="project-readiness">
                         <h2>
                             Общий % готовности проекта:{" "}
-                            {readinessData[selectedProject.id]?.projectReadiness || 0}%
+                            {readinessData[selectedProject._id]?.projectReadiness || 0}%
                         </h2>
                     </div>
                     <ConstructiveGroupList
                         selectedProject={selectedProject}
                         selectedGroup={selectedGroup}
-                        readinessData={readinessData[selectedProject.id]?.groupReadiness || {}}
+                        readinessData={readinessData[selectedProject._id]?.groupReadiness || {}}
                         handleGroupSelect={handleGroupSelect}
                     />
                 </>
