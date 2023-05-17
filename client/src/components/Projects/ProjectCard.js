@@ -12,6 +12,8 @@ import {
     Button,
     CardActions
 } from "@mui/material";
+
+import moment from 'moment';
 import EditProjectModal from "./EditProjectModal";
 
 const ProjectCard = ({ project, handleUpdate }) => {
@@ -30,15 +32,13 @@ const ProjectCard = ({ project, handleUpdate }) => {
     const handleClose = () => {
         setOpen(false);
     };
-
     const onUpdate = () => {
         handleUpdate();
     };
 
     const formatIsoDate = (dateString) => {
         if (!dateString) return "Дата не назначена";
-        const date = new Date(dateString);
-        return date.toISOString().split('T')[0];
+        return moment(dateString).utcOffset('+0600').format('DD.MM.YYYY');
     };
 
     const startDate = formatIsoDate(project.expertiseDates?.[0]?.dates.find(

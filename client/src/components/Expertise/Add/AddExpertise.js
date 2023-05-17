@@ -14,6 +14,7 @@ import {
     InputLabel,
     Button
 } from '@mui/material';
+import moment from 'moment';
 import D3TimeLine from "./D3TimeLine";
 
 const AddExpertise = () => {
@@ -227,7 +228,7 @@ const AddExpertise = () => {
                                     <CircularProgress />
                                 ) : (
                                     <Typography variant="body1">
-                                        {newDates[index] || 'N/A'}
+                                        {newDates[index] ? moment(newDates[index]).format('DD.MM.YYYY') : '...'}
                                     </Typography>
                                 )}
                             </Card>

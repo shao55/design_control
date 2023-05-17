@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Home.css';
 import axios from 'axios';
+import moment from 'moment';
 
 function Home() {
 
@@ -35,31 +36,10 @@ function Home() {
         fetchCategoryReadiness();
     }, []);
 
-    // useEffect(() => {
-    //     const script = document.createElement("script");
-    //     script.src = "https://api-maps.yandex.ru/2.1/?apikey=06d4438d-ecbf-4e9f-bf58-45321609f1f7&lang=ru_RU";
-    //     script.async = true;
-    //     document.body.appendChild(script);
-
-    //     script.addEventListener("load", () => {
-    //         window.ymaps.ready(init);
-    //     });
-
-    //     function init() {
-    //         var myMap = new window.ymaps.Map("map", {
-    //             center: [51.138116, 71.405122],
-    //             zoom: 17,
-    //             controls: []
-    //         });
-
-    //         var myPlacemark = new window.ymaps.Placemark([51.138116, 71.405122], {}, {});
-    //         myMap.geoObjects.add(myPlacemark);
-    //     }
-
-    //     return () => {
-    //         document.body.removeChild(script);
-    //     }
-    // }, []);
+    const formatIsoDate = (dateString) => {
+        if (!dateString) return "Дата не назначена";
+        return moment(dateString).utcOffset('+0600').format('DD.MM.YYYY HH:mm');
+    };
 
     return (
         <div className='home_wrap' >
@@ -81,7 +61,7 @@ function Home() {
                         changes.slice().map((change, index) => (
                             <li key={`${change.projectId}-${index}`}>
                                 Изменение в проекте "{change.projectName}", группа "{change.groupId}", лист "{change.sheetId}":
-                                готовность {change.readiness}% (Дата изменения: {change.fixationDate})
+                                готовность {change.readiness}% (Дата изменения: {formatIsoDate(change.fixationDate)})
                             </li>
                         ))
                         :
@@ -93,7 +73,7 @@ function Home() {
                     {expertiseDates.length > 0 ?
                         expertiseDates.map((expertiseDate, index) => (
                             <li key={index}>
-                                Начало загрузки на комплектацию "{expertiseDate.projectName}": {expertiseDate.date}
+                                Начало загрузки на комплектацию "{expertiseDate.projectName}": {moment(expertiseDate.date).utcOffset('+0600').format('DD.MM.YYYY')}
                             </li>
                         ))
                         :
@@ -109,9 +89,6 @@ function Home() {
                     <p>Республика Казахстан, Нур-Султан, Қайым Мухамедханова 5 , блок Б, Офис 5-3 , 5-этаж</p>
                     <p>Телефон: +7 (7172) 79-64-00</p>
                 </div>
-                {/* <div id="map" style={{ width: '100%', height: '150px' }}>
-                    <h3>Наши контакты:</h3>
-                </div> */}
             </div>
         </div>
     )

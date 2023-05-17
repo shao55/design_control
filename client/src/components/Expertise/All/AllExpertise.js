@@ -11,6 +11,7 @@ import {
     Typography,
     Container
 } from '@mui/material';
+import moment from 'moment';
 
 function AllExpertise() {
     const [projects, setProjects] = useState([]);
@@ -37,8 +38,6 @@ function AllExpertise() {
         fetchProjects();
         fetchStages();
     }, [])
-
-    console.log(projects)
 
     return (
         <div>
@@ -67,7 +66,7 @@ function AllExpertise() {
                                     {project.expertiseDates[project.expertiseDates.length - 1].dates.map(
                                         (dateObj, index) => (
                                             <TableCell key={index} align="right">
-                                                {new Date(dateObj.date).toISOString().slice(0, 10)}
+                                                {moment(dateObj.date).format('DD.MM.YYYY')}
                                             </TableCell>
                                         )
                                     )}
