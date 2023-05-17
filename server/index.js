@@ -127,9 +127,7 @@ app.get('/categoryReadiness', async (req, res) => {
 app.get('/expertiseDates', async (req, res) => {
     try {
         let expertiseDates = [];
-
-        const projects = await Project.find({});
-
+        const projects = await Project.find({}).lean();
         projects.forEach(project => {
             if (project.expertiseDates && project.expertiseDates.length > 0) {
                 const lastExpertiseDateObj = project.expertiseDates[project.expertiseDates.length - 1];
@@ -146,11 +144,11 @@ app.get('/expertiseDates', async (req, res) => {
                 }
             }
         });
-
         expertiseDates.sort((a, b) => new Date(a.date) - new Date(b.date));
         const currentDate = new Date();
         expertiseDates = expertiseDates.filter(expertiseDateObj => new Date(expertiseDateObj.date) > currentDate);
         expertiseDates = expertiseDates.slice(0, 5);
+        console.log(expertiseDates)
         res.json(expertiseDates);
 
     } catch (error) {
@@ -163,7 +161,7 @@ app.get('/changes', async (req, res) => {
     try {
         let changes = [];
 
-        const projects = await Project.find({});
+        const projects = await Project.find({})
 
         projects.forEach(project => {
             project.constructiveGroups.forEach(group => {
@@ -171,7 +169,7 @@ app.get('/changes', async (req, res) => {
                     sheet.changes.forEach(change => {
                         const enrichedChange = {
                             projectId: project._id.toString(),
-                            ...change.toObject(), // this is important
+                            ...change.toObject(),
                             projectName: project.name,
                             groupId: group.name,
                             sheetId: sheet.name,
@@ -182,10 +180,11 @@ app.get('/changes', async (req, res) => {
             });
         });
 
-        // changes = changes.slice(-5);
+        // Сортируем массив `changes` по `fixationDate` в обратном порядке (сначала самые свежие)
+        changes.sort((a, b) => new Date(b.fixationDate) - new Date(a.fixationDate));
 
-        console.log(changes)
-        res.json(changes);
+        // Отправляем только последние 5 изменений
+        res.json(changes.slice(0, 5));
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error', error: error.toString() });

@@ -78,7 +78,7 @@ function Home() {
                 <h2>Последние обновления</h2>
                 <ul>
                     {changes.length > 0 ?
-                        changes.slice().reverse().map((change, index) => (
+                        changes.slice().map((change, index) => (
                             <li key={`${change.projectId}-${index}`}>
                                 Изменение в проекте "{change.projectName}", группа "{change.groupId}", лист "{change.sheetId}":
                                 готовность {change.readiness}% (Дата изменения: {change.fixationDate})
