@@ -252,7 +252,7 @@ app.put("/projects/:id", async (req, res) => {
         // Сохранение обновленного проекта
         const savedProject = await project.save();
 
-        res.send(savedProject);
+        res.status(200).send(savedProject);
     } catch (error) {
         console.error(error);
         res.status(500).send("Внутренняя ошибка сервера");
