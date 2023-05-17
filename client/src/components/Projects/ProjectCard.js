@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Card,
     CardContent,
@@ -13,12 +13,25 @@ import {
     CardActions
 } from "@mui/material";
 
+import axios from 'axios';
+
 import moment from 'moment';
 import EditProjectModal from "./EditProjectModal";
 
 const ProjectCard = ({ project, handleUpdate }) => {
     const [open, setOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
+    const [readinessData, setReadinessData] = useState({});
+
+    const fetchReadinessData = async () => {
+        try {
+            const response = await axios.get("http://localhost:8000/readiness");
+            const projectReadinessData = response.data[project._id];
+            setReadinessData(projectReadinessData);
+        } catch (error) {
+            console.error("Ошибка при загрузке данных готовности:", error);
+        }
+    };
 
     const handleEditModalOpen = () => {
         setEditModalOpen(true);
@@ -35,6 +48,9 @@ const ProjectCard = ({ project, handleUpdate }) => {
     const onUpdate = () => {
         handleUpdate();
     };
+    useEffect(() => {
+        fetchReadinessData();
+    }, [])
 
     const formatIsoDate = (dateString) => {
         if (!dateString) return "Дата не назначена";
@@ -142,7 +158,26 @@ const ProjectCard = ({ project, handleUpdate }) => {
                         }}
                     >
                         <h2>{project.name}</h2>
-                        {/* Дополнительная информация о проекте */}
+                        {parseFloat(readinessData?.projectReadiness) > 0 && (
+                            <h3>Процент готовности проекта: {readinessData.projectReadiness}%</h3>
+                        )}
+                        {readinessData?.groupReadiness && Object.entries(readinessData.groupReadiness).map(([groupId, groupData], index) => (
+                            parseFloat(groupData.groupReadiness) > 0 && (
+                                <p key={index}>
+                                    Процент готовности конструктива {groupData.groupName}: {groupData.groupReadiness}%
+                                </p>
+                            )
+                        ))}
+                        {project.expertiseDates?.[0]?.dates && (
+                            <>
+                                <h3>Сроки прохождения экспертизы:</h3>
+                                {project.expertiseDates[0].dates.map((dateObj, index) => (
+                                    <p key={index}>
+                                        {dateObj.stage}: {formatIsoDate(dateObj.date)}
+                                    </p>
+                                ))}
+                            </>
+                        )}
                     </div>
                 </Fade>
             </Modal>

@@ -67,6 +67,7 @@ const AddExpertise = () => {
             setStartDate(latestStartDate);
         } else {
             setStartDate("");
+            setNewDates([]);
         }
     };
 
@@ -127,8 +128,11 @@ const AddExpertise = () => {
     };
 
     const fetchDates = async () => {
-        if (!startDate) return;
-
+        if (!startDate) {
+            setNewDates([]); // Обновляем newDates на пустой массив, если startDate пуста
+            setLoading(false); // Установливаем состояние загрузки в false, если startDate пуста
+            return;
+        }
         setLoading(true);
         setNewDates([]);
         let prevDates = [];
