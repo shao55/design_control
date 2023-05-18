@@ -13,8 +13,6 @@ const EditProjectModal = ({ open, handleClose, project, onUpdate }) => {
         }));
     };
 
-
-
     const handleSave = async () => {
         try {
             await axios.put(`http://localhost:8000/projects/${project._id}`, updatedProject);
@@ -84,7 +82,6 @@ const EditProjectModal = ({ open, handleClose, project, onUpdate }) => {
                     <MenuItem value="current">Текущий</MenuItem>
                     <MenuItem value="perspective">Перспективный</MenuItem>
                 </Select>
-                {/* Добавьте другие поля для редактирования, аналогично выше */}
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Отмена</Button>

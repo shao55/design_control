@@ -55,14 +55,14 @@ const D3TimeLine = ({ stages, newDates }) => {
         svg
             .append('g')
             .attr('class', 'y-axis')
-            .call(d3.axisLeft(y).tickFormat('')) // Удалите форматирование меток
+            .call(d3.axisLeft(y).tickFormat(''))
             .selectAll('g.tick')
-            .append('foreignObject') // Добавьте foreignObject к каждому элементу
+            .append('foreignObject') 
             .attr('width', 250)
             .attr('height', y.bandwidth())
-            .attr('x', -260) // Расположение по оси X
-            .attr('y', -y.bandwidth() / 2) // Расположение по оси Y
-            .append('xhtml:div') // Добавьте div внутри foreignObject
+            .attr('x', -260)
+            .attr('y', -y.bandwidth() / 2)
+            .append('xhtml:div') 
             .attr('style', 'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif; white-space: pre-wrap; width: 250px; text-align: end;')
             .text((d) => d);
 
@@ -82,9 +82,9 @@ const D3TimeLine = ({ stages, newDates }) => {
             .enter()
             .append('text')
             .attr('class', 'point-label')
-            .attr('x', (d) => x(d.date) + 10) // Смещение меток вправо от точек
-            .attr('y', (d) => y(d.name) + y.bandwidth() / 2 + 5) // Смещение меток по вертикали для центрирования
-            .text((d) => d3.timeFormat("%Y-%m-%d")(d.date)) // Форматирование даты
+            .attr('x', (d) => x(d.date) + 10) 
+            .attr('y', (d) => y(d.name) + y.bandwidth() / 2 + 5) 
+            .text((d) => d3.timeFormat("%Y-%m-%d")(d.date))
             .style('font-size', '12px')
             .style('fill', '#000');
     };

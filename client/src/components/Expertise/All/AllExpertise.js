@@ -8,8 +8,6 @@ import {
     TableHead,
     TableRow,
     Paper,
-    Typography,
-    Container
 } from '@mui/material';
 import moment from 'moment';
 
@@ -62,7 +60,6 @@ function AllExpertise() {
                                     <TableCell component="th" scope="row">
                                         {project.name}
                                     </TableCell>
-                                    {/* Отображение значений дат здесь */}
                                     {project.expertiseDates[project.expertiseDates.length - 1].dates.map(
                                         (dateObj, index) => (
                                             <TableCell key={index} align="right">

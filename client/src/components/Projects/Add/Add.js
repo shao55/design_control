@@ -62,14 +62,12 @@ function AddProject() {
         const newConstructiveGroups = [...project.constructiveGroups];
         newConstructiveGroups[index][name] = value;
         setProject({ ...project, constructiveGroups: newConstructiveGroups });
-        // calculateWeights();
     };
     const handleSheetChange = (cIndex, sIndex, event) => {
         const { name, value } = event.target;
         const newConstructiveGroups = [...project.constructiveGroups];
         newConstructiveGroups[cIndex].sheets[sIndex][name] = value;
         setProject({ ...project, constructiveGroups: newConstructiveGroups });
-        // calculateWeights();
     };
     const addConstructive = () => {
         setProject({
@@ -102,7 +100,6 @@ function AddProject() {
     };
     const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(project);
         try {
             const response = await fetch('http://localhost:8000/create', {
                 method: 'POST',

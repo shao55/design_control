@@ -14,11 +14,9 @@ import PercentIcon from '@mui/icons-material/Percent';
 import MoreTimeIcon from '@mui/icons-material/MoreTime';
 import ViewTimelineIcon from '@mui/icons-material/ViewTimeline';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
-// import EditIcon from '@mui/icons-material/Edit';
 
 import Home from './components/Home/Home';
 import AddProject from './components/Projects/Add/Add';
-// import EditProject from './components/Projects/Edit/Edit';
 import AllProjects from './components/Projects/All/All';
 import PerspectiveProjects from './components/Projects/Perspective/Perspective';
 import CurrentProjects from './components/Projects/Current/Current';
@@ -45,7 +43,6 @@ function App() {
     'PercentIcon': PercentIcon,
     'MoreTimeIcon': MoreTimeIcon,
     'ViewTimelineIcon': ViewTimelineIcon,
-    // 'EditIcon': EditIcon
   };
 
   const updateLastVisitedRoute = (route) => {
@@ -82,12 +79,6 @@ function App() {
     groups[item.group].push(item);
     return groups;
   }, {});
-
-  // xs, extra - small: 0px
-  // sm, small: 600px
-  // md, medium: 900px
-  // lg, large: 1200px
-  // xl, extra - large: 1536px
 
   return (
     <div className='App'>
@@ -130,7 +121,6 @@ function App() {
                 <Routes>
                   <Route path='/' element={<Home />} />
                   <Route path='/addProject' element={<AddProject />} />
-                  {/* <Route path='/editProject' element={<EditProject />} /> */}
                   <Route path='/allProjects' element={<AllProjects />} />
                   <Route path='/projects/perspective' element={<PerspectiveProjects />} />
                   <Route path='/projects/current' element={<CurrentProjects />} />

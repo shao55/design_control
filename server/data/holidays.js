@@ -14,7 +14,6 @@ const holidays = [
     "2023-08-30",
     "2023-10-25",
     "2023-12-18",
-    // Формат: "YYYY-MM-DD"
 ];
 
 module.exports = holidays;

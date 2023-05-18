@@ -72,13 +72,12 @@ const AddExpertise = () => {
     };
 
     const handleSave = async () => {
-        // Проверяем, выбран ли проект и дата
         if (!selectedProject || !startDate) {
             alert("Выберите проект и дату");
             return;
         }
         const newExpertiseDate = {
-            saveDate: new Date().toISOString(), // текущая дата сохранения
+            saveDate: new Date().toISOString(),
             dates: [
                 {
                     stage: "Дата начала загрузки на комплектацию",
@@ -90,12 +89,12 @@ const AddExpertise = () => {
                 })),
             ],
         };
-        // Обновляем массив expertiseDates выбранного проекта
+
         const updatedExpertiseDates = [
             ...projects.find((project) => project._id === selectedProject).expertiseDates,
             newExpertiseDate,
         ];
-        // Отправляем данные на бэкенд для обновления
+
         try {
             const response = await fetch("http://localhost:8000/update-project-dates", {
                 method: "POST",
@@ -110,7 +109,6 @@ const AddExpertise = () => {
                 setNewDates([]);
                 fetchProjects();
                 alert("Даты успешно сохранены");
-                // Если нужно обновить данные проекта на фронтенде, это надо сделать тут
             } else {
                 alert("Ошибка при сохранении дат");
             }
@@ -129,8 +127,8 @@ const AddExpertise = () => {
 
     const fetchDates = async () => {
         if (!startDate) {
-            setNewDates([]); // Обновляем newDates на пустой массив, если startDate пуста
-            setLoading(false); // Установливаем состояние загрузки в false, если startDate пуста
+            setNewDates([]);
+            setLoading(false);
             return;
         }
         setLoading(true);

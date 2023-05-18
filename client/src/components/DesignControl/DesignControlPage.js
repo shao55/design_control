@@ -9,6 +9,7 @@ import HistoryChanges from './HistoryChanges';
 import axios from "axios";
 
 const DesignControlPage = () => {
+
     const [projects, setProjects] = useState([]);
     const [selectedProject, setSelectedProject] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
@@ -37,9 +38,9 @@ const DesignControlPage = () => {
     };
 
     const handleProjectChange = (event) => {
-        const projectId = event.target.value; // избавляемся от parseInt
+        const projectId = event.target.value;
         setSelectedProjectId(projectId);
-        setSelectedProject(projects.find((project) => project._id === projectId)); // используйте _id
+        setSelectedProject(projects.find((project) => project._id === projectId));
         setSelectedGroup(null);
         setSelectedSheet(null);
     };
@@ -54,7 +55,7 @@ const DesignControlPage = () => {
         setSelectedSheet(sheet);
     };
 
-    const findProject = (projectId) => projects.find((project) => project._id === projectId); // используйте _id
+    const findProject = (projectId) => projects.find((project) => project._id === projectId);
     const findGroup = (project, groupName) => project.constructiveGroups.find((group) => group.name === groupName);
     const findSheet = (group, sheetName) => group.sheets.find((sheet) => sheet.name === sheetName);
 
@@ -83,30 +84,25 @@ const DesignControlPage = () => {
                 fixationDate: new Date().toISOString()
             };
 
-            // Add the new change to the sheet's changes array
             selectedSheet.changes.push(newChange);
 
             const response = await axios.put(
-                `http://localhost:8000/projects/${selectedProject._id}/constructiveGroups/${selectedConstructiveGroupName}/sheets/${sheetName}`, // используйте _id
+                `http://localhost:8000/projects/${selectedProject._id}/constructiveGroups/${selectedConstructiveGroupName}/sheets/${sheetName}`,
                 selectedSheet
             );
 
-            // Update the state with the updated project data received from the backend
             const updatedProject = response.data;
             setProjects(
                 projects.map((project) =>
-                    project._id === updatedProject._id ? updatedProject : project // используйте _id
+                    project._id === updatedProject._id ? updatedProject : project
                 )
             );
 
-            // Update the selected project, group, and sheet
             setSelectedProject(updatedProject);
             setSelectedGroup(findGroup(updatedProject, selectedConstructiveGroupName));
             setSelectedSheet(findSheet(selectedConstructiveGroup, sheetName));
 
-            // Fetch the updated readiness data
             fetchReadinessData();
-            console.log(projects);
         } catch (error) {
             console.error(error.message);
         }

@@ -1,13 +1,8 @@
 import React from 'react';
 import { Card, CardContent, Grid, Typography } from '@mui/material';
 
-const ConstructiveGroupList = ({
-  selectedProject,
-  selectedGroup,
-  readinessData,
-  handleGroupSelect,
-}) => {
-  console.log(readinessData);
+const ConstructiveGroupList = ({ selectedProject, selectedGroup, readinessData, handleGroupSelect }) => {
+
   return (
     <div>
       <h2>Конструктивы</h2>

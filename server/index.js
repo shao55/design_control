@@ -29,7 +29,6 @@ mongoose
     .catch(err => console.log(err));
 
 
-// Расчет готовности проекта
 const calculateReadiness = async (projectId) => {
     let totalReadiness = 0;
     const project = await Project.findById(projectId);
@@ -47,7 +46,7 @@ const calculateReadiness = async (projectId) => {
 
     return totalReadiness.toFixed(2);
 };
-// Расчет готовности конструктивов в проекте
+
 const calculateGroupReadiness = (group) => {
     let totalReadiness = 0;
     group.sheets.forEach((sheet) => {
@@ -58,7 +57,7 @@ const calculateGroupReadiness = (group) => {
 
     return totalReadiness.toFixed(2);
 };
-// Общая функция расчета и обновления объекта readinessData
+
 const getReadinessData = async () => {
     let readinessData = {};
     const projects = await Project.find();
@@ -92,7 +91,7 @@ app.get('/readiness', async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.toString() });
     }
 });
-// Расчет общего % готовности проектов по категориям
+
 const calculateCategoryReadiness = async () => {
     const categories = {
         'perspective': [],
@@ -101,10 +100,10 @@ const calculateCategoryReadiness = async () => {
         'completed': [],
     };
 
-    const projects = await Project.find({}); // Получение всех проектов из базы данных
+    const projects = await Project.find({});
 
     await Promise.all(projects.map(async (project) => {
-        const readiness = await calculateReadiness(project._id); // Убедитесь, что calculateReadiness возвращает промис
+        const readiness = await calculateReadiness(project._id);
         categories[project.category].push(parseFloat(readiness));
     }));
 
@@ -120,7 +119,7 @@ const calculateCategoryReadiness = async () => {
 };
 
 app.get('/categoryReadiness', async (req, res) => {
-    const categoryReadiness = await calculateCategoryReadiness(); // calculateCategoryReadiness теперь асинхронная функция
+    const categoryReadiness = await calculateCategoryReadiness();
     res.json(categoryReadiness);
 });
 
@@ -148,7 +147,6 @@ app.get('/expertiseDates', async (req, res) => {
         const currentDate = new Date();
         expertiseDates = expertiseDates.filter(expertiseDateObj => new Date(expertiseDateObj.date) > currentDate);
         expertiseDates = expertiseDates.slice(0, 5);
-        console.log(expertiseDates)
         res.json(expertiseDates);
 
     } catch (error) {
@@ -180,10 +178,7 @@ app.get('/changes', async (req, res) => {
             });
         });
 
-        // Сортируем массив `changes` по `fixationDate` в обратном порядке (сначала самые свежие)
         changes.sort((a, b) => new Date(b.fixationDate) - new Date(a.fixationDate));
-
-        // Отправляем только последние 5 изменений
         res.json(changes.slice(0, 5));
     } catch (error) {
         console.error(error);
@@ -213,13 +208,8 @@ app.put('/projects/:projectId/constructiveGroups/:constructiveGroupName/sheets/:
             return res.status(404).json({ error: 'Sheet not found' });
         }
 
-        // Обновите лист с новыми данными
         Object.assign(sheet, updatedSheet);
-
-        // Сохраните обновленный проект
         await project.save();
-
-        // Отправьте обновленный проект в качестве ответа
         res.json(project);
 
     } catch (error) {
@@ -239,7 +229,6 @@ app.put("/projects/:id", async (req, res) => {
             return res.status(404).send("Проект не найден");
         }
 
-        // Обновление полей проекта
         project.name = updatedProject.name;
         project.customer = updatedProject.customer;
         project.management = updatedProject.management;
@@ -247,9 +236,6 @@ app.put("/projects/:id", async (req, res) => {
         project.curator = updatedProject.curator;
         project.category = updatedProject.category;
 
-        // Здесь вы можете добавить обновление других полей
-
-        // Сохранение обновленного проекта
         const savedProject = await project.save();
 
         res.status(200).send(savedProject);
@@ -288,7 +274,6 @@ app.get("/projects/:category", async (req, res) => {
 
     try {
         const filteredProjects = await Project.find({ category: category });
-        console.log("Сработал запрос!");
         res.json(filteredProjects);
     } catch (err) {
         console.error(err);
@@ -302,13 +287,10 @@ app.post("/create", async (req, res) => {
     if (newProjectData && newProjectData.name) {
         try {
             const newProject = new Project(newProjectData);
-
-            // Save the new project in the database
             const savedProject = await newProject.save();
-
             res.status(201).json(savedProject);
         } catch (error) {
-            console.log(error); // Add this line
+            console.log(error);
             res.status(500).send({ message: "Error creating project", error: error.toString() });
         }
     } else {
@@ -359,7 +341,6 @@ app.post("/calculate-date", (req, res) => {
 app.get("/allProjects", async (req, res) => {
     try {
         const projects = await Project.find({});
-        console.log("Запрос списка всех проектов");
         res.json(projects);
     } catch (err) {
         console.error(err);
@@ -380,7 +361,6 @@ app.post("/update-project-dates", async (req, res) => {
             project.expertiseDates = expertiseDates;
             await project.save();
             res.status(200).send({ message: "Project dates updated successfully" });
-            console.log(project)
         } else {
             res.status(404).send({ message: "Project not found" });
         }
