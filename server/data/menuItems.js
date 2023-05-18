@@ -6,13 +6,13 @@ const menuItems = [
         title: "Добавить проект",
         icon: "AddBoxIcon",
     },
-    {
-        id: 2,
-        path: "/editProject",
-        group: "Проекты",
-        title: "Редактировать проект",
-        icon: "EditIcon",
-    },
+    // {
+    //     id: 2,
+    //     path: "/editProject",
+    //     group: "Проекты",
+    //     title: "Редактировать проект",
+    //     icon: "EditIcon",
+    // },
     {
         id: 3,
         path: "/allProjects",
